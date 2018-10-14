@@ -4,13 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - UpperCollider
-  - LowerCollider
-  - LeftCollider
-  - RightCollider
-  - Background
-  - Box
   - Wall
+  - Box
   layers:
   - Default
   - TransparentFX
@@ -49,11 +44,11 @@ TagManager:
     uniqueID: 0
     locked: 0
   - name: Background
-    uniqueID: 2846422927
+    uniqueID: 321910937
     locked: 0
   - name: Box
-    uniqueID: 1252032419
+    uniqueID: 888295065
     locked: 0
   - name: Player
-    uniqueID: 2914245221
+    uniqueID: 2290396637
     locked: 0
