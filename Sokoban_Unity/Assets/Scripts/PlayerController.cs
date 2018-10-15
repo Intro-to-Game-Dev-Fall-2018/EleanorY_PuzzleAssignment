@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		Debug.Log(Blocked());
 		if (Input.GetKey(Up) && _pos == transform.position && !_keyPressed)
 		{
 			_pos += Vector3.up * GridSize;
@@ -57,7 +58,7 @@ public class PlayerController : MonoBehaviour
 			_pos += Vector3.right * GridSize;
 			_keyPressed = true;
 			Movement = new Vector3(1, 0, 0);
-			
+
 		}
 
 		if (Input.GetKey(Left) && _pos == transform.position && !_keyPressed)
@@ -72,7 +73,7 @@ public class PlayerController : MonoBehaviour
 			_keyPressed = false;
 		}
 
-		
+
 		if (!Blocked())
 		{
 			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
@@ -80,11 +81,15 @@ public class PlayerController : MonoBehaviour
 		else
 		{
 			_pos = transform.position;
+//			transform.position = new Vector3(
+//				Mathf.Round(_pos.x),
+//				Mathf.Round(_pos.y),
+//				Mathf.Round(_pos.z));
 		}
-		
-		
+
+
 	}
-	
+
 	private void OnCollisionEnter2D(Collision2D other)
 	{
 		if (other.gameObject.CompareTag("Box") && other.gameObject.GetComponent<BoxController>().EnterObstacle)
@@ -95,8 +100,17 @@ public class PlayerController : MonoBehaviour
 				Mathf.Round(transform.position.y),
 				Mathf.Round(transform.position.z));
 		}
+
+		if (other.gameObject.CompareTag("Wall"))
+		{
+			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+			_pos = new Vector3(
+				Mathf.Round(transform.position.x),
+				Mathf.Round(transform.position.y),
+				Mathf.Round(transform.position.z));
+		}
 	}
-	
+
 
 	bool Blocked()
 	{
@@ -117,10 +131,7 @@ public class PlayerController : MonoBehaviour
 		}
 		
 		return false;
-
 	}
-	
-	
 }
 
 

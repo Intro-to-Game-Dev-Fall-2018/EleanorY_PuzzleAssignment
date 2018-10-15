@@ -33,47 +33,52 @@ public class BoxController : MonoBehaviour {
 
 	void Update()
 	{
+		_currentPos = transform.position;
 		_offset = Player.transform.position - transform.position;
 		if (_offset.x < -0.5f && _offset.x >= -1.0f && Mathf.Abs(_offset.y) < 0.8f)
 		{
 			_targetPos = transform.position + Vector3.right;
-			Debug.Log("left");
-			Debug.Log("TargetPos: " + _targetPos);
-			Debug.Log(Blocked());
+//			Debug.Log("left");
+//			Debug.Log("TargetPos: " + _targetPos);
+//			Debug.Log(Blocked());
 		} 
 		else if (_offset.x > 0.5f && _offset.x <= 1.0f  && Mathf.Abs(_offset.y) < 0.8f)
 		{
 			_targetPos = transform.position + Vector3.left;
-			Debug.Log("right");
-			Debug.Log("TargetPos: " + _targetPos);
-			Debug.Log(Blocked());
+//			Debug.Log("right");
+//			Debug.Log("TargetPos: " + _targetPos);
+//			Debug.Log(Blocked());
 		}
 		else if (_offset.y < -0.5f && _offset.y >= -1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
 			_targetPos = transform.position + Vector3.up;
-			Debug.Log("down");
-			Debug.Log("TargetPos: " + _targetPos);
-			Debug.Log(Blocked());
+//			Debug.Log("down");
+//			Debug.Log("TargetPos: " + _targetPos);
+//			Debug.Log(Blocked());
 		} 
 		else if (_offset.y > 0.5f && _offset.y <= 1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
 			_targetPos = transform.position + Vector3.down;
-			Debug.Log("up");
-			Debug.Log("TargetPos: " + _targetPos);
-			Debug.Log(Blocked());
+//			Debug.Log("up");
+//			Debug.Log("TargetPos: " + _targetPos);
+//			Debug.Log(Blocked());
 		}
 		else
 		{
-			Debug.Log("NotTouched");
+//			Debug.Log("NotTouched");
 			_targetPos = transform.position;
-			Debug.Log(Blocked());
+//			Debug.Log(Blocked());
 		}
 
 
 		if (Blocked())
 		{
-			Debug.Log("Blocked");
+//			Debug.Log("Blocked");
 			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+			transform.position = new Vector3(
+				Mathf.Round(_currentPos.x),
+				Mathf.Round(_currentPos.y),
+				Mathf.Round(_currentPos.z));
 		}
 	}
 	
@@ -83,7 +88,6 @@ public class BoxController : MonoBehaviour {
 		if (other.gameObject.CompareTag("Player"))
 		{
 //			_targetPos = transform.position;
-			_currentPos = transform.position;
 			transform.position = new Vector3(
 				Mathf.Round(_currentPos.x),
 				Mathf.Round(_currentPos.y),
@@ -93,6 +97,7 @@ public class BoxController : MonoBehaviour {
 		if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Box"))
 		{
 			EnterObstacle = false;
+			GetComponent<Rigidbody2D>().isKinematic = false;
 		}
 	}
 	private void OnCollisionEnter2D(Collision2D other)
@@ -100,11 +105,13 @@ public class BoxController : MonoBehaviour {
 		if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Box"))
 		{
 			EnterObstacle = true;
+			Debug.Log("EnterObstacle");
 			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
 			transform.position = new Vector3(
 				Mathf.Round(_currentPos.x),
 				Mathf.Round(_currentPos.y),
 				Mathf.Round(_currentPos.z));
+			GetComponent<Rigidbody2D>().isKinematic = true;
 		}
 	}
 	
