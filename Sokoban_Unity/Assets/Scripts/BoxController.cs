@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class BoxController : MonoBehaviour {
 	private Vector3 _currentPos;
-	private Vector3 _targetPos;
+	public Vector3 TargetPos;
+	private Vector3 _expectTarget;
 	
 	
 	private GameObject[] _walls;
-	private GameObject[] _boxs;
+	private GameObject[] _boxes;
 
 	public GameObject Player;
 	private Vector3 _offset;
@@ -19,155 +20,285 @@ public class BoxController : MonoBehaviour {
 	private KeyCode _right;
 	private KeyCode _back;
 	public bool EnterObstacle;
+
+	private int _playerStatus;
+	
+
+	public Vector3 Movement;
 	
 
 	void Start()
 	{
 		_walls = GameObject.FindGameObjectsWithTag("Wall");
-		_boxs = GameObject.FindGameObjectsWithTag("Box");
+		_boxes = GameObject.FindGameObjectsWithTag("Box");
 		_up = Player.GetComponent<PlayerController>().Up;
 		_down = Player.GetComponent<PlayerController>().Down;
 		_left = Player.GetComponent<PlayerController>().Left;
 		_right = Player.GetComponent<PlayerController>().Right;
+		TargetPos = transform.position;
+		_expectTarget = transform.position;
 	}
 
 	void Update()
-	{
+	{	
 		_currentPos = transform.position;
 		_offset = Player.transform.position - transform.position;
 		if (_offset.x < -0.5f && _offset.x >= -1.0f && Mathf.Abs(_offset.y) < 0.8f)
 		{
-			_targetPos = transform.position + Vector3.right;
+			_expectTarget = new Vector3(
+				Mathf.Round(_currentPos.x + 1),
+				Mathf.Round(_currentPos.y),
+				Mathf.Round(_currentPos.z));
 //			Debug.Log("left");
-//			Debug.Log("TargetPos: " + _targetPos);
 //			Debug.Log(Blocked());
+//			Debug.Log(_expectTarget);
+			_playerStatus = 3;
 		} 
 		else if (_offset.x > 0.5f && _offset.x <= 1.0f  && Mathf.Abs(_offset.y) < 0.8f)
 		{
-			_targetPos = transform.position + Vector3.left;
+			_expectTarget = new Vector3(
+				Mathf.Round(_currentPos.x - 1),
+				Mathf.Round(_currentPos.y),
+				Mathf.Round(_currentPos.z));
 //			Debug.Log("right");
-//			Debug.Log("TargetPos: " + _targetPos);
 //			Debug.Log(Blocked());
+//			Debug.Log(_expectTarget);
+			_playerStatus = 4;
 		}
 		else if (_offset.y < -0.5f && _offset.y >= -1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
-			_targetPos = transform.position + Vector3.up;
+			_expectTarget = new Vector3(
+				Mathf.Round(_currentPos.x),
+				Mathf.Round(_currentPos.y + 1),
+				Mathf.Round(_currentPos.z));
 //			Debug.Log("down");
-//			Debug.Log("TargetPos: " + _targetPos);
 //			Debug.Log(Blocked());
+//			Debug.Log(_expectTarget);
+			_playerStatus = 2;
 		} 
 		else if (_offset.y > 0.5f && _offset.y <= 1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
-			_targetPos = transform.position + Vector3.down;
+			_expectTarget = new Vector3(
+				Mathf.Round(_currentPos.x),
+				Mathf.Round(_currentPos.y - 1),
+				Mathf.Round(_currentPos.z));
 //			Debug.Log("up");
-//			Debug.Log("TargetPos: " + _targetPos);
 //			Debug.Log(Blocked());
+//			Debug.Log(_expectTarget);
+//			Debug.Log(_playerStatus);
+			_playerStatus = 1;
 		}
 		else
 		{
-//			Debug.Log("NotTouched");
-			_targetPos = transform.position;
-//			Debug.Log(Blocked());
+			_expectTarget = transform.position;
+			_playerStatus = 0;
 		}
 
-
-		if (Blocked())
+		if (!Blocked())
 		{
-//			Debug.Log("Blocked");
-			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+		transform.position = Vector3.MoveTowards(_currentPos, TargetPos, Time.deltaTime * 8);
+		}
+		else
+		{
 			transform.position = new Vector3(
 				Mathf.Round(_currentPos.x),
 				Mathf.Round(_currentPos.y),
 				Mathf.Round(_currentPos.z));
-		}
-	}
-	
-
-	private void OnCollisionExit2D(Collision2D other)
-	{
-		if (other.gameObject.CompareTag("Player"))
-		{
-//			_targetPos = transform.position;
-			transform.position = new Vector3(
-				Mathf.Round(_currentPos.x),
-				Mathf.Round(_currentPos.y),
-				Mathf.Round(_currentPos.z));
+			TargetPos = transform.position;
 		}
 
-		if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Box"))
-		{
-			EnterObstacle = false;
-			GetComponent<Rigidbody2D>().isKinematic = false;
-		}
+//		if (!Input.anyKeyDown)
+//		{
+//			transform.position = new Vector3(
+//				Mathf.Round(_currentPos.x),
+//				Mathf.Round(_currentPos.y),
+//				Mathf.Round(_currentPos.z));
+//		}
 	}
-	private void OnCollisionEnter2D(Collision2D other)
-	{
-		if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Box"))
-		{
-			EnterObstacle = true;
-			Debug.Log("EnterObstacle");
-			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-			transform.position = new Vector3(
-				Mathf.Round(_currentPos.x),
-				Mathf.Round(_currentPos.y),
-				Mathf.Round(_currentPos.z));
-			GetComponent<Rigidbody2D>().isKinematic = true;
-		}
-	}
+
+
+
+//	private void OnCollisionExit2D(Collision2D other)
+//	{
+//		if (other.gameObject.CompareTag("Player"))
+//		{
+////			_targetPos = transform.position;
+//			transform.position = new Vector3(
+//				Mathf.Round(_currentPos.x),
+//				Mathf.Round(_currentPos.y),
+//				Mathf.Round(_currentPos.z));
+//		}
+//
+//		if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Box"))
+//		{
+//			EnterObstacle = false;
+//			GetComponent<Rigidbody2D>().isKinematic = false;
+//		}
+//	}
+//	private void OnCollisionEnter2D(Collision2D other)
+//	{
+//		if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Box"))
+//		{
+//			EnterObstacle = true;
+//			Debug.Log("EnterObstacle");
+//			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+//			transform.position = new Vector3(
+//				Mathf.Round(_currentPos.x),
+//				Mathf.Round(_currentPos.y),
+//				Mathf.Round(_currentPos.z));
+//			GetComponent<Rigidbody2D>().isKinematic = true;
+//		}
+//	}
 	
 	
 	public bool Blocked()
 	{
 		foreach (var wall in _walls)
 		{
-			Vector3 distance = wall.transform.position - _targetPos;
-			Vector3 direction = wall.transform.position - transform.position;
-			if (Mathf.Abs(distance.x) < 0.02f && Mathf.Abs(distance.y) < 0.02f)
+			if (wall.transform.position == _expectTarget)
 			{
-				if (direction.x > 0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_right))
+				switch (_playerStatus)
 				{
-					return true;
-				}
-				if (direction.x < -0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_left))
-				{
-					return true;
-				}
-				if (direction.y > 0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_up))
-				{
-					return true;
-				}
-				if (direction.y < -0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_down))
-				{
-					return true;
+					case 0:
+						return false;
+					case 1:
+						if (Input.GetKey(_down))
+						{
+							Debug.Log("try to move down but no");
+							return true;
+
+						}
+						else
+						{
+							Debug.Log("not moving down");
+							return false;
+						}
+					case 2:
+						if (Input.GetKey(_up))
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					case 3:
+						if (Input.GetKey(_right))
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					case 4:
+						if (Input.GetKey(_left))
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
 				}
 			}
 		}
+//			Vector3 distance = wall.transform.position - TargetPos;
+//			Vector3 direction = wall.transform.position - transform.position;
+//			if (Mathf.Abs(distance.x) < 0.02f && Mathf.Abs(distance.y) < 0.02f)
+//			{
+//				if (direction.x > 0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_right))
+//				{
+//					return true;
+//				}
+//				if (direction.x < -0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_left))
+//				{
+//					return true;
+//				}
+//				if (direction.y > 0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_up))
+//				{
+//					return true;
+//				}
+//				if (direction.y < -0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_down))
+//				{
+//					return true;
+//				}
+//			}
 
-		foreach (var box in _boxs)
-		{
-			Vector3 distance = box.transform.position - _targetPos;
-			Vector3 direction = box.transform.position - transform.position;
-			if (Mathf.Abs(distance.x) < 0.02f && Mathf.Abs(distance.y) < 0.02f)
+			foreach (var box in _boxes)
 			{
-				if (direction.x > 0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_right))
+				Debug.Log(_expectTarget);
+				if (box != this.gameObject && box.transform.position == _expectTarget)
 				{
-					return true;
-				}
-				if (direction.x < -0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_left))
-				{
-					return true;
-				}
-				if (direction.y > 0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_up))
-				{
-					return true;
-				}
-				if (direction.y < -0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_down))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
+					switch (_playerStatus)
+					{
+						case 0:
+							return false;
+						case 1:
+							if (Input.GetKey(_down))
+							{
+								Debug.Log("try to move down but no");
+								return true;
 
-	}
+							}
+							else
+							{
+								Debug.Log("not moving down");
+								return false;
+							}
+						case 2:
+							if (Input.GetKey(_up))
+							{
+								return true;
+							}
+							else
+							{
+								return false;
+							}
+						case 3:
+							if (Input.GetKey(_right))
+							{
+								return true;
+							}
+							else
+							{
+								return false;
+							}
+						case 4:
+							if (Input.GetKey(_left))
+							{
+								return true;
+							}
+							else
+							{
+								return false;
+							}
+					}
+				}
+
+//			Vector3 distance = box.transform.position - TargetPos;
+//			Vector3 direction = box.transform.position - transform.position;
+//			if (Mathf.Abs(distance.x) < 0.02f && Mathf.Abs(distance.y) < 0.02f)
+//			{
+//				if (direction.x > 0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_right))
+//				{
+//					return true;
+//				}
+//				if (direction.x < -0.02f && Mathf.Abs(direction.y) < 0.02f && Input.GetKey(_left))
+//				{
+//					return true;
+//				}
+//				if (direction.y > 0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_up))
+//				{
+//					return true;
+//				}
+//				if (direction.y < -0.02f && Mathf.Abs(direction.x) < 0.02f && Input.GetKey(_down))
+//				{
+//					return true;
+//				}
+//			}
+			}
+
+			return false;
+		}
 }
