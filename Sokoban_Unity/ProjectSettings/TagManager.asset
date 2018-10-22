@@ -11,6 +11,7 @@ TagManager:
   - Background
   - Box
   - Wall
+  - Goal
   layers:
   - Default
   - TransparentFX
@@ -51,9 +52,15 @@ TagManager:
   - name: Background
     uniqueID: 2846422927
     locked: 0
+  - name: Goal
+    uniqueID: 874790095
+    locked: 0
   - name: Box
     uniqueID: 1252032419
     locked: 0
   - name: Player
     uniqueID: 2914245221
+    locked: 0
+  - name: UI
+    uniqueID: 1372731663
     locked: 0

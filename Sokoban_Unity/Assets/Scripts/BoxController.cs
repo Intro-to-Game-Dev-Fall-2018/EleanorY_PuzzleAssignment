@@ -10,6 +10,7 @@ public class BoxController : MonoBehaviour {
 	
 	private GameObject[] _walls;
 	private GameObject[] _boxes;
+	private GameObject[] _goals;
 
 	public GameObject Player;
 	private Vector3 _offset;
@@ -19,22 +20,27 @@ public class BoxController : MonoBehaviour {
 	private KeyCode _left;
 	private KeyCode _right;
 	private KeyCode _back;
-	public bool EnterObstacle;
 
 	private int _playerStatus;
-	
 
-	public Vector3 Movement;
+	private SpriteRenderer _spriteRenderer;
+	public Sprite DarkBox;
+	public Sprite LightBox;
+
+	public bool ReachGoal;
+	
 	
 
 	void Start()
 	{
 		_walls = GameObject.FindGameObjectsWithTag("Wall");
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
+		_goals = GameObject.FindGameObjectsWithTag("Goal");
 		_up = Player.GetComponent<PlayerController>().Up;
 		_down = Player.GetComponent<PlayerController>().Down;
 		_left = Player.GetComponent<PlayerController>().Left;
 		_right = Player.GetComponent<PlayerController>().Right;
+		_spriteRenderer = GetComponent<SpriteRenderer>();
 		TargetPos = transform.position;
 		_expectTarget = transform.position;
 	}
@@ -46,9 +52,12 @@ public class BoxController : MonoBehaviour {
 		if (_offset.x < -0.5f && _offset.x >= -1.0f && Mathf.Abs(_offset.y) < 0.8f)
 		{
 			_expectTarget = new Vector3(
-				Mathf.Round(_currentPos.x + 1),
-				Mathf.Round(_currentPos.y),
-				Mathf.Round(_currentPos.z));
+				_currentPos.x + 1,
+				_currentPos.y,
+				_currentPos.z);
+//				Mathf.Round(_currentPos.x + 1),
+//				Mathf.Round(_currentPos.y),
+//				Mathf.Round(_currentPos.z));
 //			Debug.Log("left");
 //			Debug.Log(Blocked());
 //			Debug.Log(_expectTarget);
@@ -57,9 +66,9 @@ public class BoxController : MonoBehaviour {
 		else if (_offset.x > 0.5f && _offset.x <= 1.0f  && Mathf.Abs(_offset.y) < 0.8f)
 		{
 			_expectTarget = new Vector3(
-				Mathf.Round(_currentPos.x - 1),
-				Mathf.Round(_currentPos.y),
-				Mathf.Round(_currentPos.z));
+				_currentPos.x - 1,
+				_currentPos.y,
+				_currentPos.z);
 //			Debug.Log("right");
 //			Debug.Log(Blocked());
 //			Debug.Log(_expectTarget);
@@ -68,9 +77,9 @@ public class BoxController : MonoBehaviour {
 		else if (_offset.y < -0.5f && _offset.y >= -1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
 			_expectTarget = new Vector3(
-				Mathf.Round(_currentPos.x),
-				Mathf.Round(_currentPos.y + 1),
-				Mathf.Round(_currentPos.z));
+				_currentPos.x,
+				_currentPos.y + 1,
+				_currentPos.z);
 //			Debug.Log("down");
 //			Debug.Log(Blocked());
 //			Debug.Log(_expectTarget);
@@ -79,9 +88,9 @@ public class BoxController : MonoBehaviour {
 		else if (_offset.y > 0.5f && _offset.y <= 1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
 			_expectTarget = new Vector3(
-				Mathf.Round(_currentPos.x),
-				Mathf.Round(_currentPos.y - 1),
-				Mathf.Round(_currentPos.z));
+				_currentPos.x,
+				_currentPos.y - 1,
+				_currentPos.z);
 //			Debug.Log("up");
 //			Debug.Log(Blocked());
 //			Debug.Log(_expectTarget);
@@ -98,14 +107,14 @@ public class BoxController : MonoBehaviour {
 		{
 		transform.position = Vector3.MoveTowards(_currentPos, TargetPos, Time.deltaTime * 8);
 		}
-		else
-		{
-			transform.position = new Vector3(
-				Mathf.Round(_currentPos.x),
-				Mathf.Round(_currentPos.y),
-				Mathf.Round(_currentPos.z));
-			TargetPos = transform.position;
-		}
+//		else
+//		{
+//			transform.position = new Vector3(
+//				Mathf.Round(_currentPos.x),
+//				Mathf.Round(_currentPos.y),
+//				Mathf.Round(_currentPos.z));
+//			TargetPos = transform.position;
+//		}
 
 //		if (!Input.anyKeyDown)
 //		{
@@ -114,6 +123,19 @@ public class BoxController : MonoBehaviour {
 //				Mathf.Round(_currentPos.y),
 //				Mathf.Round(_currentPos.z));
 //		}
+
+		foreach (var goal in _goals)
+		{
+			if (transform.position == goal.transform.position)
+			{
+				_spriteRenderer.sprite = DarkBox;
+				ReachGoal = true;
+				return;
+			}
+			ReachGoal = false;
+			_spriteRenderer.sprite = LightBox;			
+		}
+		
 	}
 
 
@@ -164,13 +186,11 @@ public class BoxController : MonoBehaviour {
 					case 1:
 						if (Input.GetKey(_down))
 						{
-							Debug.Log("try to move down but no");
 							return true;
 
 						}
 						else
 						{
-							Debug.Log("not moving down");
 							return false;
 						}
 					case 2:
@@ -227,7 +247,6 @@ public class BoxController : MonoBehaviour {
 
 			foreach (var box in _boxes)
 			{
-				Debug.Log(_expectTarget);
 				if (box != this.gameObject && box.transform.position == _expectTarget)
 				{
 					switch (_playerStatus)
@@ -237,13 +256,10 @@ public class BoxController : MonoBehaviour {
 						case 1:
 							if (Input.GetKey(_down))
 							{
-								Debug.Log("try to move down but no");
 								return true;
-
 							}
 							else
 							{
-								Debug.Log("not moving down");
 								return false;
 							}
 						case 2:
@@ -298,7 +314,6 @@ public class BoxController : MonoBehaviour {
 //				}
 //			}
 			}
-
 			return false;
 		}
 }

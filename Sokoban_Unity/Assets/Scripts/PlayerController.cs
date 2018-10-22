@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,9 +18,7 @@ public class PlayerController : MonoBehaviour
 	public float Speed;
 	public float GridSize;
 	public Vector3 Movement;
-
-//	private float _fracMovement;
-//	private float _timer;
+	private int _direction;
 
 	private bool _keyPressed;
 
@@ -30,14 +26,29 @@ public class PlayerController : MonoBehaviour
 	private Vector3 _tr;
 
 	private bool _setOffset;
+	private bool _pushBox;
 
+	[SerializeField] private SpriteRenderer _sprRen;
+//	[SerializeField] private Animator _animator;
+
+	public Sprite Horizontal1;
+	public Sprite Horizontal2;
+	public Sprite Vertical1;
+	public Sprite Vertical2;
 	
+	public int Move;
+	private bool _animDir;
+
+
 	void Start()
 	{
+		Move = 0;
 		_walls = GameObject.FindGameObjectsWithTag("Wall");
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
 		_pos = transform.position;
-
+		_sprRen = GetComponent<SpriteRenderer>();
+//		_animator = GetComponent<Animator>();
+		_sprRen.sprite = Horizontal2;
 	}
 
 
@@ -45,69 +56,143 @@ public class PlayerController : MonoBehaviour
 	{
 		if (Input.GetKey(Up))
 		{
+			_animDir = true;
 			Movement = new Vector3(0, 1, 0);
+			_direction = 1;
 			if (_pos == transform.position && !_keyPressed)
 			{
 				_pos += Vector3.up * GridSize;
 				_keyPressed = true;
+				if (!Blocked())
+				{
+					Move++;
+				}
 			}
 		}
 
 		if (Input.GetKey(Down))
 		{
+			_animDir = true;
 			Movement = new Vector3(0, -1, 0);
+			_direction = 2;
 			if (_pos == transform.position && !_keyPressed)
 			{
 				_pos += Vector3.down * GridSize;
 				_keyPressed = true;
+				if (!Blocked())
+				{
+					Move++;
+				}
 			}
 		}
 
 		if (Input.GetKey(Right))
 		{
+			_animDir = false;
+			Movement = new Vector3(1, 0, 0);
+			_direction = 3;
 			if (_pos == transform.position && !_keyPressed)
 			{
 				_pos += Vector3.right * GridSize;
 				_keyPressed = true;
-				Movement = new Vector3(1, 0, 0);
+				if (!Blocked())
+				{
+					Move++;
+				}
 			}
 		}
 
 		if (Input.GetKey(Left))
 		{
+			_animDir = false;
 			Movement = new Vector3(-1, 0, 0);
+			_direction = 4;
 			if (_pos == transform.position && !_keyPressed)
 			{
 				_pos += Vector3.left * GridSize;
 				_keyPressed = true;
+				if (!Blocked())
+				{
+					Move++;
+				}
 			}
 		}
 
 		if (!Input.anyKeyDown && transform.position == _pos)
 		{
 			_keyPressed = false;
-//			_pos = transform.position;
-//			if (transform.position == _pos)
-//			{
-				Movement = new Vector3(0, 0, 0);
-//			}
+			Movement = new Vector3(0, 0, 0);
+			_direction = 0;
 		}
 
 
-		
+
 		if (!Blocked())
 		{
-			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed );
+			if (_keyPressed)
+			{
+				switch (_direction)
+				{
+					case 1:
+						transform.localScale = new Vector3(1, 1, 1);
+//						_animator.SetBool("HorizontalMove", false);
+//						_animator.SetBool("VerticalMove", true);
+						break;
+					case 2:
+						transform.localScale = new Vector3(1, -1, 1);
+//						_animator.SetBool("HorizontalMove", false);
+//						_animator.SetBool("VerticalMove", true);
+						break;
+					case 3:
+//						_animDir = false;
+						transform.localScale = new Vector3(1, 1, 1);
+//						_animator.SetBool("HorizontalMove", true);
+//						_animator.SetBool("VerticalMove", false);
+						break;
+					case 4:
+//						_animDir = false;
+						transform.localScale = new Vector3(-1, 1, 1);
+//						_animator.SetBool("HorizontalMove", true);
+//						_animator.SetBool("VerticalMove", false);
+						break;
+					case 0:
+//						_animator.SetBool("HorizontalMove", false);
+//						_animator.SetBool("VerticalMove", false);
+						break;
+				}
+			}
+			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
 		}
-		else 
+		else
 		{
 			_pos = new Vector3(
 				Mathf.Round(transform.position.x),
 				Mathf.Round(transform.position.y),
 				Mathf.Round(transform.position.z));
 		}
-
-
+		
+		if (_animDir)
+		{
+			if (Move % 2 == 0)
+			{
+				_sprRen.sprite = Vertical1;
+			}
+			else
+			{
+				_sprRen.sprite = Vertical2;
+			}
+		}
+		else
+		{
+			if (Move % 2 == 0)
+			{
+				_sprRen.sprite = Horizontal1;
+			}
+			else
+			{
+				_sprRen.sprite = Horizontal2;;
+			}
+		}
 	}
 
 	private void OnTriggerEnter2D(Collider2D other)
@@ -115,6 +200,7 @@ public class PlayerController : MonoBehaviour
 		if (other.CompareTag("Box"))
 		{
 			other.GetComponent<BoxController>().TargetPos += Movement;
+			
 		}
 	}
 
