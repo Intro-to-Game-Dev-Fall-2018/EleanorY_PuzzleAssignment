@@ -10,3 +10,13 @@
      - Arrow keys to move.
 
 ---
+
+[Ver1.2_20181022](https://jiaxi-yang.itch.io/sokoban-ver12)
+
+    Update:
+    - Fixed collision and movement;
+    - Goal and Winning Conditions;
+    - Move Counts;
+    - Descrete animation
+
+---
