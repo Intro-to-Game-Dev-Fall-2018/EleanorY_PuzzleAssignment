@@ -8,7 +8,8 @@ public class GameManager : MonoBehaviour
 {
 
 	private GameObject[] _boxes;
-	public GameObject WinText;
+//	public GameObject WinText;
+	public Text WinText;
 	public Text MoveCount;
 
 	private int _moveCount;
@@ -18,6 +19,7 @@ public class GameManager : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
+		WinText.enabled = false;
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
 	}
 
@@ -31,7 +33,7 @@ public class GameManager : MonoBehaviour
 
 		if (AllSet())
 		{
-			WinText.SetActive(true);
+			WinText.enabled = true;
 		}
 
 		_moveCount = Player.GetComponent<PlayerController>().Move;

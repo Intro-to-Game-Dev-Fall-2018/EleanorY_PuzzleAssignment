@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
+		Debug.Log(transform.localScale);
 		if (Input.GetKey(Up))
 		{
 			_animDir = true;
@@ -129,38 +130,6 @@ public class PlayerController : MonoBehaviour
 
 		if (!Blocked())
 		{
-			if (_keyPressed)
-			{
-				switch (_direction)
-				{
-					case 1:
-						transform.localScale = new Vector3(1, 1, 1);
-//						_animator.SetBool("HorizontalMove", false);
-//						_animator.SetBool("VerticalMove", true);
-						break;
-					case 2:
-						transform.localScale = new Vector3(1, -1, 1);
-//						_animator.SetBool("HorizontalMove", false);
-//						_animator.SetBool("VerticalMove", true);
-						break;
-					case 3:
-//						_animDir = false;
-						transform.localScale = new Vector3(1, 1, 1);
-//						_animator.SetBool("HorizontalMove", true);
-//						_animator.SetBool("VerticalMove", false);
-						break;
-					case 4:
-//						_animDir = false;
-						transform.localScale = new Vector3(-1, 1, 1);
-//						_animator.SetBool("HorizontalMove", true);
-//						_animator.SetBool("VerticalMove", false);
-						break;
-					case 0:
-//						_animator.SetBool("HorizontalMove", false);
-//						_animator.SetBool("VerticalMove", false);
-						break;
-				}
-			}
 			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
 		}
 		else
@@ -171,6 +140,38 @@ public class PlayerController : MonoBehaviour
 				Mathf.Round(transform.position.z));
 		}
 		
+		if (Input.anyKey)
+		{
+			switch (_direction)
+			{
+				case 1:
+					transform.localScale = new Vector3(1, 1, 1);
+//						_animator.SetBool("HorizontalMove", false);
+//						_animator.SetBool("VerticalMove", true);
+					break;
+				case 2:
+					transform.localScale = new Vector3(1, -1, 1);
+//						_animator.SetBool("HorizontalMove", false);
+//						_animator.SetBool("VerticalMove", true);
+					break;
+				case 3:
+//						_animDir = false;
+					transform.localScale = new Vector3(1, 1, 1);
+//						_animator.SetBool("HorizontalMove", true);
+//						_animator.SetBool("VerticalMove", false);
+					break;
+				case 4:
+//						_animDir = false;
+					transform.localScale = new Vector3(-1, 1, 1);
+//						_animator.SetBool("HorizontalMove", true);
+//						_animator.SetBool("VerticalMove", false);
+					break;
+				case 0:
+//						_animator.SetBool("HorizontalMove", false);
+//						_animator.SetBool("VerticalMove", false);
+					break;
+			}
+		}
 		if (_animDir)
 		{
 			if (Move % 2 == 0)

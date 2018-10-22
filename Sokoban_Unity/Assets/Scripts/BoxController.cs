@@ -107,14 +107,14 @@ public class BoxController : MonoBehaviour {
 		{
 		transform.position = Vector3.MoveTowards(_currentPos, TargetPos, Time.deltaTime * 8);
 		}
-//		else
-//		{
-//			transform.position = new Vector3(
-//				Mathf.Round(_currentPos.x),
-//				Mathf.Round(_currentPos.y),
-//				Mathf.Round(_currentPos.z));
-//			TargetPos = transform.position;
-//		}
+		else
+		{
+			transform.position = new Vector3(
+				Mathf.Round(_currentPos.x),
+				Mathf.Round(_currentPos.y),
+				Mathf.Round(_currentPos.z));
+			TargetPos = transform.position;
+		}
 
 //		if (!Input.anyKeyDown)
 //		{
