@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -20,13 +21,21 @@ public class PlayerController : MonoBehaviour
 	public Vector3 Movement;
 	private int _direction;
 
+	private bool _push;
+	private GameObject _boxPushed;
+	private bool _back;
+
 	private bool _keyPressed;
 
 	private Vector3 _pos;
 	private Vector3 _tr;
 
 	private bool _setOffset;
-	private bool _pushBox;
+
+
+	private Vector3 _lastPlayerPos;
+	private Vector3 _lastBoxPos;
+	
 
 	[SerializeField] private SpriteRenderer _sprRen;
 //	[SerializeField] private Animator _animator;
@@ -35,15 +44,24 @@ public class PlayerController : MonoBehaviour
 	public Sprite Horizontal2;
 	public Sprite Vertical1;
 	public Sprite Vertical2;
-	
+	public Sprite Victory;
+	public Sprite HorizontalPush1;
+	public Sprite HorizontalPush2;
+	public Sprite VerticalPush1;
+	public Sprite VerticalPush2;
+
 	public int Move;
 	private bool _animDir;
+
+	public GameManager GameManager;
 
 
 	void Start()
 	{
+		_back = true;
 		Move = 0;
 		_walls = GameObject.FindGameObjectsWithTag("Wall");
+		_boxes = GameObject.FindGameObjectsWithTag("Box");
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
 		_pos = transform.position;
 		_sprRen = GetComponent<SpriteRenderer>();
@@ -54,7 +72,7 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-		Debug.Log(transform.localScale);
+		Debug.Log(_boxPushed);
 		if (Input.GetKey(Up))
 		{
 			_animDir = true;
@@ -62,11 +80,23 @@ public class PlayerController : MonoBehaviour
 			_direction = 1;
 			if (_pos == transform.position && !_keyPressed)
 			{
+				_lastPlayerPos = new Vector3(
+					Mathf.Round(transform.position.x),
+					Mathf.Round(transform.position.y),
+					Mathf.Round(transform.position.z));
+				if (_push)
+				{
+					_lastBoxPos = new Vector3(
+						Mathf.Round(_boxPushed.transform.position.x),
+						Mathf.Round(_boxPushed.transform.position.y),
+						Mathf.Round(_boxPushed.transform.position.z));
+				}
 				_pos += Vector3.up * GridSize;
 				_keyPressed = true;
 				if (!Blocked())
 				{
 					Move++;
+					_back = false;
 				}
 			}
 		}
@@ -78,11 +108,23 @@ public class PlayerController : MonoBehaviour
 			_direction = 2;
 			if (_pos == transform.position && !_keyPressed)
 			{
+				_lastPlayerPos = new Vector3(
+					Mathf.Round(transform.position.x),
+					Mathf.Round(transform.position.y),
+					Mathf.Round(transform.position.z));
+				if (_push)
+				{
+					_lastBoxPos = new Vector3(
+						Mathf.Round(_boxPushed.transform.position.x),
+						Mathf.Round(_boxPushed.transform.position.y),
+						Mathf.Round(_boxPushed.transform.position.z));
+				}
 				_pos += Vector3.down * GridSize;
 				_keyPressed = true;
 				if (!Blocked())
 				{
 					Move++;
+					_back = false;
 				}
 			}
 		}
@@ -94,11 +136,23 @@ public class PlayerController : MonoBehaviour
 			_direction = 3;
 			if (_pos == transform.position && !_keyPressed)
 			{
+				_lastPlayerPos = new Vector3(
+					Mathf.Round(transform.position.x),
+					Mathf.Round(transform.position.y),
+					Mathf.Round(transform.position.z));
+				if (_push)
+				{
+					_lastBoxPos = new Vector3(
+						Mathf.Round(_boxPushed.transform.position.x),
+						Mathf.Round(_boxPushed.transform.position.y),
+						Mathf.Round(_boxPushed.transform.position.z));
+				}
 				_pos += Vector3.right * GridSize;
 				_keyPressed = true;
 				if (!Blocked())
 				{
 					Move++;
+					_back = false;
 				}
 			}
 		}
@@ -110,144 +164,187 @@ public class PlayerController : MonoBehaviour
 			_direction = 4;
 			if (_pos == transform.position && !_keyPressed)
 			{
+				_lastPlayerPos = new Vector3(
+					Mathf.Round(transform.position.x),
+					Mathf.Round(transform.position.y),
+					Mathf.Round(transform.position.z));
+				if (_push)
+				{
+					_lastBoxPos = new Vector3(
+						Mathf.Round(_boxPushed.transform.position.x),
+						Mathf.Round(_boxPushed.transform.position.y),
+						Mathf.Round(_boxPushed.transform.position.z));
+				}
 				_pos += Vector3.left * GridSize;
 				_keyPressed = true;
 				if (!Blocked())
 				{
 					Move++;
+					_back = false;
 				}
 			}
 		}
 
+		if (Input.GetKeyUp(Back))
+		{
+			_pos = _lastPlayerPos;
+			if (_push)
+			{
+				_boxPushed.GetComponent<BoxController>().TargetPos = _lastBoxPos;
+			}
+
+			if (!_back)
+			{
+				Move--;
+				_back = true;
+			}
+
+		}
+
 		if (!Input.anyKeyDown && transform.position == _pos)
-		{
-			_keyPressed = false;
-			Movement = new Vector3(0, 0, 0);
-			_direction = 0;
-		}
-
-
-
-		if (!Blocked())
-		{
-			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
-		}
-		else
-		{
-			_pos = new Vector3(
-				Mathf.Round(transform.position.x),
-				Mathf.Round(transform.position.y),
-				Mathf.Round(transform.position.z));
-		}
-		
-		if (Input.anyKey)
-		{
-			switch (_direction)
 			{
-				case 1:
-					transform.localScale = new Vector3(1, 1, 1);
-//						_animator.SetBool("HorizontalMove", false);
-//						_animator.SetBool("VerticalMove", true);
-					break;
-				case 2:
-					transform.localScale = new Vector3(1, -1, 1);
-//						_animator.SetBool("HorizontalMove", false);
-//						_animator.SetBool("VerticalMove", true);
-					break;
-				case 3:
-//						_animDir = false;
-					transform.localScale = new Vector3(1, 1, 1);
-//						_animator.SetBool("HorizontalMove", true);
-//						_animator.SetBool("VerticalMove", false);
-					break;
-				case 4:
-//						_animDir = false;
-					transform.localScale = new Vector3(-1, 1, 1);
-//						_animator.SetBool("HorizontalMove", true);
-//						_animator.SetBool("VerticalMove", false);
-					break;
-				case 0:
-//						_animator.SetBool("HorizontalMove", false);
-//						_animator.SetBool("VerticalMove", false);
-					break;
+				_keyPressed = false;
+				Movement = new Vector3(0, 0, 0);
+				_direction = 0;
 			}
-		}
-		if (_animDir)
-		{
-			if (Move % 2 == 0)
+
+
+
+			if (!Blocked())
 			{
-				_sprRen.sprite = Vertical1;
+				transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
 			}
 			else
 			{
-				_sprRen.sprite = Vertical2;
+				_pos = new Vector3(
+					Mathf.Round(transform.position.x),
+					Mathf.Round(transform.position.y),
+					Mathf.Round(transform.position.z));
 			}
-		}
-		else
-		{
-			if (Move % 2 == 0)
+
+			if (Input.anyKey)
 			{
-				_sprRen.sprite = Horizontal1;
+				switch (_direction)
+				{
+					case 1:
+						transform.localScale = new Vector3(1, 1, 1);
+
+						break;
+					case 2:
+						transform.localScale = new Vector3(1, -1, 1);
+						break;
+					case 3:
+						transform.localScale = new Vector3(1, 1, 1);
+						break;
+					case 4:
+						transform.localScale = new Vector3(-1, 1, 1);
+						break;
+					case 0:
+						break;
+				}
+			}
+
+			if (!GameManager.AllSet())
+			{
+				if (_animDir)
+				{
+					if (!_push)
+					{
+						if (Move % 2 == 0)
+						{
+							_sprRen.sprite = Vertical1;
+						}
+						else
+						{
+							_sprRen.sprite = Vertical2;
+						}
+					}
+					else
+					{
+						if (Move % 2 == 0)
+						{
+							_sprRen.sprite = VerticalPush1;
+						}
+						else
+						{
+							_sprRen.sprite = VerticalPush2;
+						}
+					}
+				}
+				else
+				{
+					if (!_push)
+					{
+						if (Move % 2 == 0)
+						{
+							_sprRen.sprite = Horizontal1;
+						}
+						else
+						{
+							_sprRen.sprite = Horizontal2;
+						}
+					}
+					else
+					{
+						if (Move % 2 == 0)
+						{
+							_sprRen.sprite = HorizontalPush1;
+						}
+						else
+						{
+							_sprRen.sprite = HorizontalPush2;
+						}
+					}
+				}
 			}
 			else
 			{
-				_sprRen.sprite = Horizontal2;;
+				_sprRen.sprite = Victory;
+				Speed = 0.0f;
+			}
+
+
+			if (_push && Vector3.Distance(_boxPushed.transform.position, transform.position) > 1.4f)
+			{
+				_push = false;
 			}
 		}
-	}
 
 	private void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.CompareTag("Box"))
 		{
 			other.GetComponent<BoxController>().TargetPos += Movement;
-			
+			_boxPushed = other.gameObject;
+			_push = true;
+			_lastBoxPos = other.transform.position;
+
+
 		}
 	}
 
-
-//	private void OnCollisionEnter2D(Collision2D other)
-//	{
-//		if (other.gameObject.CompareTag("Box") && other.gameObject.GetComponent<BoxController>().EnterObstacle)
-//		{
-//			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-//			_pos = new Vector3(
-//				Mathf.Round(transform.position.x),
-//				Mathf.Round(transform.position.y),
-//				Mathf.Round(transform.position.z));
-//		}
-//
-//		if (other.gameObject.CompareTag("Wall"))
-//		{
-//			GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-//			_pos = new Vector3(
-//				Mathf.Round(transform.position.x),
-//				Mathf.Round(transform.position.y),
-//				Mathf.Round(transform.position.z));
-//		}
-//	}se
-
-	
 	bool Blocked()
 	{
-	
-			foreach (var wall in _walls)
+
+		foreach (var wall in _walls)
+		{
+			if (wall.transform.position == _pos)
 			{
-				if (wall.transform.position == _pos)
-				{
-					return true;
-				}
+				return true;
 			}
-			foreach (var box in _boxes)
+		}
+
+		foreach (var box in _boxes)
+		{
+			if (box.GetComponent<BoxController>().Blocked())
 			{
-				if (box.GetComponent<BoxController>().Blocked())
-				{
-					return true;
-				}
+				return true;
 			}
-	
+		}
+
 		return false;
 	}
 }
+
 
 

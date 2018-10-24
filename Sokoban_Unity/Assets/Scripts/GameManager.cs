@@ -15,12 +15,14 @@ public class GameManager : MonoBehaviour
 	private int _moveCount;
 
 	public GameObject Player;
-
+	private int _scene;
+	
 	// Use this for initialization
 	void Start()
 	{
 		WinText.enabled = false;
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
+		_scene = SceneManager.GetActiveScene().buildIndex;
 	}
 
 	// Update is called once per frame
@@ -28,21 +30,35 @@ public class GameManager : MonoBehaviour
 	{
 		if (Input.GetKeyUp(KeyCode.R))
 		{
-			SceneManager.LoadScene(0);
+			SceneManager.LoadScene(_scene);
 		}
 
 		if (AllSet())
 		{
+			Player.transform.localScale = new Vector3( 1, 1, 1);
+			Player.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Victory");
 			WinText.enabled = true;
+			Player.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Victory");
 		}
 
 		_moveCount = Player.GetComponent<PlayerController>().Move;
 		MoveCount.text = _moveCount.ToString().PadLeft(4, '0');
+		if (Input.GetKeyUp("1"))
+		{
+			if (_scene + 1 < SceneManager.sceneCountInBuildSettings)
+			{
+				SceneManager.LoadScene(_scene + 1);
+			} else
+			{
+				SceneManager.LoadScene(0);
+			}		
+		}
+
 
 	}
 
 
-	private bool AllSet()
+	public bool AllSet()
 	{
 		foreach (var box in _boxes)
 		{
