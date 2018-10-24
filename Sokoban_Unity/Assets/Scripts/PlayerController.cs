@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
+using System.Timers;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -38,7 +39,6 @@ public class PlayerController : MonoBehaviour
 	
 
 	[SerializeField] private SpriteRenderer _sprRen;
-//	[SerializeField] private Animator _animator;
 
 	public Sprite Horizontal1;
 	public Sprite Horizontal2;
@@ -65,7 +65,6 @@ public class PlayerController : MonoBehaviour
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
 		_pos = transform.position;
 		_sprRen = GetComponent<SpriteRenderer>();
-//		_animator = GetComponent<Animator>();
 		_sprRen.sprite = Horizontal2;
 	}
 
@@ -202,7 +201,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		if (!Input.anyKeyDown && transform.position == _pos)
-			{
+		{
 				_keyPressed = false;
 				Movement = new Vector3(0, 0, 0);
 				_direction = 0;
@@ -227,17 +226,25 @@ public class PlayerController : MonoBehaviour
 				switch (_direction)
 				{
 					case 1:
-						transform.localScale = new Vector3(1, 1, 1);
+						_sprRen.flipX = false;
+						_sprRen.flipY = false;
+//						transform.localScale = new Vector3(1, 1, 1);
 
 						break;
 					case 2:
-						transform.localScale = new Vector3(1, -1, 1);
+						_sprRen.flipX = false;
+						_sprRen.flipY = true;
+//						transform.localScale = new Vector3(1, -1, 1);
 						break;
 					case 3:
-						transform.localScale = new Vector3(1, 1, 1);
+						_sprRen.flipX = false;
+						_sprRen.flipY = false;
+//						transform.localScale = new Vector3(1, 1, 1);
 						break;
 					case 4:
-						transform.localScale = new Vector3(-1, 1, 1);
+						_sprRen.flipX = true;
+						_sprRen.flipY = false;
+//						transform.localScale = new Vector3(-1, 1, 1);
 						break;
 					case 0:
 						break;
@@ -307,7 +314,7 @@ public class PlayerController : MonoBehaviour
 			if (_push && Vector3.Distance(_boxPushed.transform.position, transform.position) > 1.4f)
 			{
 				_push = false;
-			}
+			}		
 		}
 
 	private void OnTriggerEnter2D(Collider2D other)
@@ -318,8 +325,6 @@ public class PlayerController : MonoBehaviour
 			_boxPushed = other.gameObject;
 			_push = true;
 			_lastBoxPos = other.transform.position;
-
-
 		}
 	}
 

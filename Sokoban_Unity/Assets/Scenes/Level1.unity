@@ -1740,7 +1740,7 @@ Prefab:
         type: 2}
       propertyPath: WinText
       value: 
-      objectReference: {fileID: 1790755551}
+      objectReference: {fileID: 1036291551}
     - target: {fileID: 114128311352455372, guid: b6bed6d0c712b479895d4f8ec825c657,
         type: 2}
       propertyPath: MoveCount
@@ -1905,6 +1905,11 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 97a4980b2962547039660200d9dc79e4, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1036291551 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1436299394207448, guid: 97a4980b2962547039660200d9dc79e4,
+    type: 2}
+  m_PrefabInternal: {fileID: 1036291550}
 --- !u!1001 &1134419778
 Prefab:
   m_ObjectHideFlags: 0
@@ -2860,12 +2865,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4871228150640002, guid: 75f185a29173e4fc18f84e2b416d098f,
     type: 2}
   m_PrefabInternal: {fileID: 1243286917}
---- !u!114 &1790755551 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114022675074563868, guid: 97a4980b2962547039660200d9dc79e4,
-    type: 2}
-  m_PrefabInternal: {fileID: 1036291550}
-  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
 --- !u!1001 &1794071238
 Prefab:
   m_ObjectHideFlags: 0
