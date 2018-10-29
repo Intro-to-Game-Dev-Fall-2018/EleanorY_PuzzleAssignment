@@ -104,7 +104,7 @@ MonoBehaviour:
   Left: 276
   Right: 275
   Back: 120
-  Speed: 5
+  Speed: 7
   GridSize: 1
   Movement: {x: 0, y: 0, z: 0}
   _sprRen: {fileID: 0}
@@ -119,6 +119,7 @@ MonoBehaviour:
   VerticalPush2: {fileID: 21300000, guid: e63bf4bc5eb6945f1b9dce0cf3432a55, type: 3}
   Move: 0
   GameManager: {fileID: 0}
+  GameStart: 0
 --- !u!212 &212049536258204774
 SpriteRenderer:
   m_ObjectHideFlags: 1

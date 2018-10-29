@@ -31,7 +31,7 @@ public class BoxController : MonoBehaviour {
 	
 	
 
-	void Start()
+	private void Start()
 	{
 		_walls = GameObject.FindGameObjectsWithTag("Wall");
 		_boxes = GameObject.FindGameObjectsWithTag("Box");
@@ -45,7 +45,7 @@ public class BoxController : MonoBehaviour {
 		_expectTarget = transform.position;
 	}
 
-	void Update()
+	private void Update()
 	{	
 		_currentPos = transform.position;
 		_offset = Player.transform.position - transform.position;

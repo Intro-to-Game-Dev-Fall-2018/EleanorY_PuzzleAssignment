@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
-using System.Timers;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -55,8 +53,10 @@ public class PlayerController : MonoBehaviour
 
 	public GameManager GameManager;
 
+	public bool GameStart;
 
-	void Start()
+
+	private void Start()
 	{
 		_back = true;
 		Move = 0;
@@ -69,253 +69,158 @@ public class PlayerController : MonoBehaviour
 	}
 
 
-	void Update()
+	private void Update()
 	{
-		Debug.Log(_boxPushed);
-		if (Input.GetKey(Up))
+		if (GameStart)
 		{
-			_animDir = true;
-			Movement = new Vector3(0, 1, 0);
-			_direction = 1;
-			if (_pos == transform.position && !_keyPressed)
+			if (Input.GetKey(Up))
 			{
-				_lastPlayerPos = new Vector3(
-					Mathf.Round(transform.position.x),
-					Mathf.Round(transform.position.y),
-					Mathf.Round(transform.position.z));
-				if (_push)
-				{
-					_lastBoxPos = new Vector3(
-						Mathf.Round(_boxPushed.transform.position.x),
-						Mathf.Round(_boxPushed.transform.position.y),
-						Mathf.Round(_boxPushed.transform.position.z));
-				}
-				_pos += Vector3.up * GridSize;
-				_keyPressed = true;
-				if (!Blocked())
-				{
-					Move++;
-					_back = false;
-				}
-			}
-		}
-
-		if (Input.GetKey(Down))
-		{
-			_animDir = true;
-			Movement = new Vector3(0, -1, 0);
-			_direction = 2;
-			if (_pos == transform.position && !_keyPressed)
-			{
-				_lastPlayerPos = new Vector3(
-					Mathf.Round(transform.position.x),
-					Mathf.Round(transform.position.y),
-					Mathf.Round(transform.position.z));
-				if (_push)
-				{
-					_lastBoxPos = new Vector3(
-						Mathf.Round(_boxPushed.transform.position.x),
-						Mathf.Round(_boxPushed.transform.position.y),
-						Mathf.Round(_boxPushed.transform.position.z));
-				}
-				_pos += Vector3.down * GridSize;
-				_keyPressed = true;
-				if (!Blocked())
-				{
-					Move++;
-					_back = false;
-				}
-			}
-		}
-
-		if (Input.GetKey(Right))
-		{
-			_animDir = false;
-			Movement = new Vector3(1, 0, 0);
-			_direction = 3;
-			if (_pos == transform.position && !_keyPressed)
-			{
-				_lastPlayerPos = new Vector3(
-					Mathf.Round(transform.position.x),
-					Mathf.Round(transform.position.y),
-					Mathf.Round(transform.position.z));
-				if (_push)
-				{
-					_lastBoxPos = new Vector3(
-						Mathf.Round(_boxPushed.transform.position.x),
-						Mathf.Round(_boxPushed.transform.position.y),
-						Mathf.Round(_boxPushed.transform.position.z));
-				}
-				_pos += Vector3.right * GridSize;
-				_keyPressed = true;
-				if (!Blocked())
-				{
-					Move++;
-					_back = false;
-				}
-			}
-		}
-
-		if (Input.GetKey(Left))
-		{
-			_animDir = false;
-			Movement = new Vector3(-1, 0, 0);
-			_direction = 4;
-			if (_pos == transform.position && !_keyPressed)
-			{
-				_lastPlayerPos = new Vector3(
-					Mathf.Round(transform.position.x),
-					Mathf.Round(transform.position.y),
-					Mathf.Round(transform.position.z));
-				if (_push)
-				{
-					_lastBoxPos = new Vector3(
-						Mathf.Round(_boxPushed.transform.position.x),
-						Mathf.Round(_boxPushed.transform.position.y),
-						Mathf.Round(_boxPushed.transform.position.z));
-				}
-				_pos += Vector3.left * GridSize;
-				_keyPressed = true;
-				if (!Blocked())
-				{
-					Move++;
-					_back = false;
-				}
-			}
-		}
-
-		if (Input.GetKeyUp(Back))
-		{
-			_pos = _lastPlayerPos;
-			if (_push)
-			{
-				_boxPushed.GetComponent<BoxController>().TargetPos = _lastBoxPos;
+				_direction = 1;
+				PlayerMove();
 			}
 
-			if (!_back)
+			if (Input.GetKey(Down))
 			{
-				Move--;
-				_back = true;
+				_direction = 2;
+				PlayerMove();
 			}
+			
+			if (Input.GetKey(Right))
+			{
+				_direction = 3;
+				PlayerMove();
+			}
+			
+			if (Input.GetKey(Left))
+			{
+				_direction = 4;
+				PlayerMove();
+			}
+			if (Input.GetKeyUp(Back))
+			{
+				_pos = _lastPlayerPos;
+				if (!_back)
+				{
+					Move--;
+					if (_push)
+					{
+						_boxPushed.GetComponent<BoxController>().TargetPos = _lastBoxPos;
+					}
+					_back = true;
+				}
 
-		}
-
-		if (!Input.anyKeyDown && transform.position == _pos)
-		{
+			}
+			if (!Input.anyKeyDown && transform.position == _pos)
+			{
 				_keyPressed = false;
 				Movement = new Vector3(0, 0, 0);
 				_direction = 0;
 			}
+		}
 
+		if (!Blocked())
+		{
+			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
+		}
+		else
+		{
+			_pos = new Vector3(
+				Mathf.Round(transform.position.x),
+				Mathf.Round(transform.position.y),
+				Mathf.Round(transform.position.z));
+		}
 
-
-			if (!Blocked())
+		if (Input.anyKey && GameStart)
+		{
+			switch (_direction)
 			{
-				transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
+				case 1:
+					_sprRen.flipX = false;
+					_sprRen.flipY = false;
+
+					break;
+				case 2:
+					_sprRen.flipX = false;
+					_sprRen.flipY = true;
+					break;
+				case 3:
+					_sprRen.flipX = false;
+					_sprRen.flipY = false;
+					break;
+				case 4:
+					_sprRen.flipX = true;
+					_sprRen.flipY = false;
+					break;
+				case 0:
+					break;
 			}
-			else
-			{
-				_pos = new Vector3(
-					Mathf.Round(transform.position.x),
-					Mathf.Round(transform.position.y),
-					Mathf.Round(transform.position.z));
-			}
+		}
 
-			if (Input.anyKey)
+		if (!GameManager.AllSet())
+		{
+			if (_animDir)
 			{
-				switch (_direction)
+				if (!_push)
 				{
-					case 1:
-						_sprRen.flipX = false;
-						_sprRen.flipY = false;
-//						transform.localScale = new Vector3(1, 1, 1);
-
-						break;
-					case 2:
-						_sprRen.flipX = false;
-						_sprRen.flipY = true;
-//						transform.localScale = new Vector3(1, -1, 1);
-						break;
-					case 3:
-						_sprRen.flipX = false;
-						_sprRen.flipY = false;
-//						transform.localScale = new Vector3(1, 1, 1);
-						break;
-					case 4:
-						_sprRen.flipX = true;
-						_sprRen.flipY = false;
-//						transform.localScale = new Vector3(-1, 1, 1);
-						break;
-					case 0:
-						break;
-				}
-			}
-
-			if (!GameManager.AllSet())
-			{
-				if (_animDir)
-				{
-					if (!_push)
+					if (Move % 2 == 0)
 					{
-						if (Move % 2 == 0)
-						{
-							_sprRen.sprite = Vertical1;
-						}
-						else
-						{
-							_sprRen.sprite = Vertical2;
-						}
+						_sprRen.sprite = Vertical1;
 					}
 					else
 					{
-						if (Move % 2 == 0)
-						{
-							_sprRen.sprite = VerticalPush1;
-						}
-						else
-						{
-							_sprRen.sprite = VerticalPush2;
-						}
+						_sprRen.sprite = Vertical2;
 					}
 				}
 				else
 				{
-					if (!_push)
+					if (Move % 2 == 0)
 					{
-						if (Move % 2 == 0)
-						{
-							_sprRen.sprite = Horizontal1;
-						}
-						else
-						{
-							_sprRen.sprite = Horizontal2;
-						}
+						_sprRen.sprite = VerticalPush1;
 					}
 					else
 					{
-						if (Move % 2 == 0)
-						{
-							_sprRen.sprite = HorizontalPush1;
-						}
-						else
-						{
-							_sprRen.sprite = HorizontalPush2;
-						}
+						_sprRen.sprite = VerticalPush2;
 					}
 				}
 			}
 			else
 			{
-				_sprRen.sprite = Victory;
-				Speed = 0.0f;
+				if (!_push)
+				{
+					if (Move % 2 == 0)
+					{
+						_sprRen.sprite = Horizontal1;
+					}
+					else
+					{
+						_sprRen.sprite = Horizontal2;
+					}
+				}
+				else
+				{
+					if (Move % 2 == 0)
+					{
+						_sprRen.sprite = HorizontalPush1;
+					}
+					else
+					{
+						_sprRen.sprite = HorizontalPush2;
+					}
+				}
 			}
-
-
-			if (_push && Vector3.Distance(_boxPushed.transform.position, transform.position) > 1.4f)
-			{
-				_push = false;
-			}		
 		}
+		else
+		{
+			_sprRen.sprite = Victory;
+			Speed = 0.0f;
+		}
+
+
+		if (_push && Vector3.Distance(_boxPushed.transform.position, transform.position) > 1.4f)
+		{
+			_push = false;
+		}		
+	}
 
 	private void OnTriggerEnter2D(Collider2D other)
 	{
@@ -324,11 +229,12 @@ public class PlayerController : MonoBehaviour
 			other.GetComponent<BoxController>().TargetPos += Movement;
 			_boxPushed = other.gameObject;
 			_push = true;
+			Debug.Log("Enter");
 			_lastBoxPos = other.transform.position;
 		}
 	}
 
-	bool Blocked()
+	private bool Blocked()
 	{
 
 		foreach (var wall in _walls)
@@ -348,6 +254,57 @@ public class PlayerController : MonoBehaviour
 		}
 
 		return false;
+	}
+
+
+	private void PlayerMove()
+	{
+		switch (_direction)
+		{
+			case 1:
+				Movement = Vector3.up;
+				_animDir = true;
+				break;
+			case 2:
+				Movement = Vector3.down;
+				_animDir = true;
+				break;
+			case 3:
+				Movement = Vector3.right;
+				_animDir = false;
+				break;
+			case 4:
+				Movement = Vector3.left;
+				_animDir = false;
+				break;
+			default:
+				Movement = Vector3.zero;
+				break;
+		}
+		if (_pos == transform.position && !_keyPressed)
+		{
+			if (!Blocked())
+			{
+				_lastPlayerPos = new Vector3(
+					Mathf.Round(transform.position.x),
+					Mathf.Round(transform.position.y),
+					Mathf.Round(transform.position.z));
+			}
+			if (_push && !_boxPushed.GetComponent<BoxController>().Blocked())
+			{
+				_lastBoxPos = new Vector3(
+					Mathf.Round(_boxPushed.transform.position.x),
+					Mathf.Round(_boxPushed.transform.position.y),
+					Mathf.Round(_boxPushed.transform.position.z));
+			}
+			_pos += Movement * GridSize;
+			_keyPressed = true;
+			if (!Blocked())
+			{
+				Move++;
+				_back = false;
+			}
+		}
 	}
 }
 
