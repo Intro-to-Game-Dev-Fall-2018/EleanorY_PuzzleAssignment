@@ -20,3 +20,27 @@
     - Descrete animation
 
 ---
+
+[Ver1.3_20181029](https://jiaxi-yang.itch.io/sokoban-ver13)
+
+    【Final Version of the Original Game】
+    Update:
+    - Undo function;
+    - Levels and Level Selection;
+    - Title and Menu screens;
+    - Audio;
+    
+    【Instruction】
+    - Press 1 to start the game.
+    - Arrow keys to move.
+    - Press X to undo one move.
+    - When text box pops up, Press up/down arrow key to swap between options and Press 1 to confirm. 
+    
+    During Game:
+    - Press 1 at any time to pause. 
+      Option 1: Restart Level. Option 2: Go to Select Menu.
+      
+    After completing a level:
+    - Option 1: Next Level. Option 2: Go to Select Menu.
+
+---
