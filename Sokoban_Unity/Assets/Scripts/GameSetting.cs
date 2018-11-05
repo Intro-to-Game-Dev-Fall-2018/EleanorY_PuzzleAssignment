@@ -25,6 +25,12 @@ public class GameSetting : ScriptableObject
 		public float GridSize;
 		public Vector3 Movement;
 		public int Move;
+		public int Direction;
+		public bool Push;
+		public Vector3 Position;
+//		public GameObject BoxPushed;
+		
+		public SpriteRenderer SpriteRenderer;
 		public GameManager GameManager;
 		public SpriteSettings Sprites;
 		public KeycodeSettings Keycodes;

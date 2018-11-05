@@ -3,43 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BoxController : MonoBehaviour {
+	public GameSetting Settings;
 	private Vector3 _currentPos;
 	public Vector3 TargetPos;
 	private Vector3 _expectTarget;
-	
-	
-	private GameObject[] _walls;
-	private GameObject[] _boxes;
-	private GameObject[] _goals;
 
 	public GameObject Player;
 	private Vector3 _offset;
-	
-	private KeyCode _up;
-	private KeyCode _down;
-	private KeyCode _left;
-	private KeyCode _right;
-	private KeyCode _back;
 
 	private int _playerStatus;
 
 	private SpriteRenderer _spriteRenderer;
 	public Sprite DarkBox;
 	public Sprite LightBox;
-
 	public bool ReachGoal;
-	
-	
 
 	private void Start()
 	{
-		_walls = GameObject.FindGameObjectsWithTag("Wall");
-		_boxes = GameObject.FindGameObjectsWithTag("Box");
-		_goals = GameObject.FindGameObjectsWithTag("Goal");
-		_up = Player.GetComponent<PlayerController>().Up;
-		_down = Player.GetComponent<PlayerController>().Down;
-		_left = Player.GetComponent<PlayerController>().Left;
-		_right = Player.GetComponent<PlayerController>().Right;
 		_spriteRenderer = GetComponent<SpriteRenderer>();
 		TargetPos = transform.position;
 		_expectTarget = transform.position;
@@ -100,7 +80,7 @@ public class BoxController : MonoBehaviour {
 			TargetPos = transform.position;
 		}
 
-		foreach (var goal in _goals)
+		foreach (var goal in Settings.Goals)
 		{
 			if (transform.position == goal.transform.position)
 			{
@@ -116,102 +96,68 @@ public class BoxController : MonoBehaviour {
 
 	public bool Blocked()
 	{
-		foreach (var wall in _walls)
+		foreach (var wall in Settings.Walls)
 		{
 			if (wall.transform.position == _expectTarget)
 			{
-				switch (_playerStatus)
-				{
-					case 0:
-						return false;
-					case 1:
-						if (Input.GetKey(_down))
-						{
-							return true;
-
-						}
-						else
-						{
-							return false;
-						}
-					case 2:
-						if (Input.GetKey(_up))
-						{
-							return true;
-						}
-						else
-						{
-							return false;
-						}
-					case 3:
-						if (Input.GetKey(_right))
-						{
-							return true;
-						}
-						else
-						{
-							return false;
-						}
-					case 4:
-						if (Input.GetKey(_left))
-						{
-							return true;
-						}
-						else
-						{
-							return false;
-						}
-				}
+				return CheckBlockedStatus();
 			}
 		}
 
-			foreach (var box in _boxes)
+		foreach (var box in Settings.Boxes)
+		{
+			if (box != this.gameObject && box.transform.position == _expectTarget)
 			{
-				if (box != this.gameObject && box.transform.position == _expectTarget)
-				{
-					switch (_playerStatus)
-					{
-						case 0:
-							return false;
-						case 1:
-							if (Input.GetKey(_down))
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-						case 2:
-							if (Input.GetKey(_up))
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-						case 3:
-							if (Input.GetKey(_right))
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-						case 4:
-							if (Input.GetKey(_left))
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-					}
-				}
+				return CheckBlockedStatus();
 			}
+		}
 			return false;
 		}
+
+	private bool CheckBlockedStatus()
+	{
+		switch (_playerStatus)
+		{
+			case 0:
+				return false;
+			case 1:
+				if (Input.GetKey(Settings.Player.Keycodes.Down))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			case 2:
+				if (Input.GetKey(Settings.Player.Keycodes.Up))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			case 3:
+				if (Input.GetKey(Settings.Player.Keycodes.Right))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			case 4:
+				if (Input.GetKey(Settings.Player.Keycodes.Left))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+		}
+		return false;
+	}
+
 }

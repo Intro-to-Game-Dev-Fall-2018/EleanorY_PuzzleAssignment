@@ -5,67 +5,26 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-	public KeyCode Up;
-	public KeyCode Down;
-	public KeyCode Left;
-	public KeyCode Right;
-	public KeyCode Back;
-
-	private GameObject[] _walls;
-	private GameObject[] _boxes;
-
-
-	public float Speed;
-	public float GridSize;
-	public Vector3 Movement;
-	private int _direction;
-
-	private bool _push;
-	private GameObject _boxPushed;
+	public GameSetting Settings;	
+	private GameObject _boxPushed;	
 	private bool _back;
-
 	private bool _keyPressed;
-
-	private Vector3 _pos;
-	private Vector3 _tr;
 
 	private bool _setOffset;
 
-
 	private Vector3 _lastPlayerPos;
 	private Vector3 _lastBoxPos;
-	
 
-	[SerializeField] private SpriteRenderer _sprRen;
-
-	public Sprite Horizontal1;
-	public Sprite Horizontal2;
-	public Sprite Vertical1;
-	public Sprite Vertical2;
-	public Sprite Victory;
-	public Sprite HorizontalPush1;
-	public Sprite HorizontalPush2;
-	public Sprite VerticalPush1;
-	public Sprite VerticalPush2;
-
-	public int Move;
 	private bool _animDir;
-
-	public GameManager GameManager;
-
 	public bool GameStart;
-
 
 	private void Start()
 	{
 		_back = true;
-		Move = 0;
-		_walls = GameObject.FindGameObjectsWithTag("Wall");
-		_boxes = GameObject.FindGameObjectsWithTag("Box");
-		_boxes = GameObject.FindGameObjectsWithTag("Box");
-		_pos = transform.position;
-		_sprRen = GetComponent<SpriteRenderer>();
-		_sprRen.sprite = Horizontal2;
+		Settings.Player.Move = 0;
+		Settings.Player.Position = transform.position;
+		Settings.Player.SpriteRenderer = GetComponent<SpriteRenderer>();
+		Settings.Player.SpriteRenderer.sprite = Settings.Player.Sprites.Horizontal2;
 	}
 
 
@@ -73,36 +32,36 @@ public class PlayerController : MonoBehaviour
 	{
 		if (GameStart)
 		{
-			if (Input.GetKey(Up))
+			if (Input.GetKey(Settings.Player.Keycodes.Up))
 			{
-				_direction = 1;
+				Settings.Player.Direction = 1;
 				PlayerMove();
 			}
 
-			if (Input.GetKey(Down))
+			if (Input.GetKey(Settings.Player.Keycodes.Down))
 			{
-				_direction = 2;
+				Settings.Player.Direction = 2;
 				PlayerMove();
 			}
 			
-			if (Input.GetKey(Right))
+			if (Input.GetKey(Settings.Player.Keycodes.Right))
 			{
-				_direction = 3;
+				Settings.Player.Direction = 3;
 				PlayerMove();
 			}
 			
-			if (Input.GetKey(Left))
+			if (Input.GetKey(Settings.Player.Keycodes.Left))
 			{
-				_direction = 4;
+				Settings.Player.Direction = 4;
 				PlayerMove();
 			}
-			if (Input.GetKeyUp(Back))
+			if (Input.GetKeyUp(Settings.Player.Keycodes.Back))
 			{
-				_pos = _lastPlayerPos;
+				Settings.Player.Position = _lastPlayerPos;
 				if (!_back)
 				{
-					Move--;
-					if (_push)
+					Settings.Player.Move--;
+					if (Settings.Player.Push)
 					{
 						_boxPushed.GetComponent<BoxController>().TargetPos = _lastBoxPos;
 					}
@@ -110,21 +69,21 @@ public class PlayerController : MonoBehaviour
 				}
 
 			}
-			if (!Input.anyKeyDown && transform.position == _pos)
+			if (!Input.anyKeyDown && transform.position == Settings.Player.Position)
 			{
 				_keyPressed = false;
-				Movement = new Vector3(0, 0, 0);
-				_direction = 0;
+				Settings.Player.Movement = new Vector3(0, 0, 0);
+				Settings.Player.Direction = 0;
 			}
 		}
 
 		if (!Blocked())
 		{
-			transform.position = Vector3.MoveTowards(transform.position, _pos, Time.deltaTime * Speed);
+			transform.position = Vector3.MoveTowards(transform.position, Settings.Player.Position, Time.deltaTime * Settings.Player.Speed);
 		}
 		else
 		{
-			_pos = new Vector3(
+			Settings.Player.Position = new Vector3(
 				Mathf.Round(transform.position.x),
 				Mathf.Round(transform.position.y),
 				Mathf.Round(transform.position.z));
@@ -132,93 +91,66 @@ public class PlayerController : MonoBehaviour
 
 		if (Input.anyKey && GameStart)
 		{
-			switch (_direction)
+			switch (Settings.Player.Direction)
 			{
 				case 1:
-					_sprRen.flipX = false;
-					_sprRen.flipY = false;
+					Settings.Player.SpriteRenderer.flipX = false;
+					Settings.Player.SpriteRenderer.flipY = false;
 
 					break;
 				case 2:
-					_sprRen.flipX = false;
-					_sprRen.flipY = true;
+					Settings.Player.SpriteRenderer.flipX = false;
+					Settings.Player.SpriteRenderer.flipY = true;
 					break;
 				case 3:
-					_sprRen.flipX = false;
-					_sprRen.flipY = false;
+					Settings.Player.SpriteRenderer.flipX = false;
+					Settings.Player.SpriteRenderer.flipY = false;
 					break;
 				case 4:
-					_sprRen.flipX = true;
-					_sprRen.flipY = false;
+					Settings.Player.SpriteRenderer.flipX = true;
+					Settings.Player.SpriteRenderer.flipY = false;
 					break;
 				case 0:
 					break;
+				default:
+					break;
 			}
 		}
-
-		if (!GameManager.AllSet())
+		if (!Settings.Player.GameManager.AllSet())
 		{
 			if (_animDir)
 			{
-				if (!_push)
+				if (!Settings.Player.Push)
 				{
-					if (Move % 2 == 0)
-					{
-						_sprRen.sprite = Vertical1;
-					}
-					else
-					{
-						_sprRen.sprite = Vertical2;
-					}
+					Settings.Player.SpriteRenderer.sprite = (Settings.Player.Move % 2 == 0) ? 	Settings.Player.Sprites.Vertical1 : Settings.Player.Sprites.Vertical2;
 				}
 				else
 				{
-					if (Move % 2 == 0)
-					{
-						_sprRen.sprite = VerticalPush1;
-					}
-					else
-					{
-						_sprRen.sprite = VerticalPush2;
-					}
+					Settings.Player.SpriteRenderer.sprite = (Settings.Player.Move % 2 == 0) ? Settings.Player.Sprites.VerticalPush1 : Settings.Player.Sprites.VerticalPush2;
 				}
 			}
 			else
 			{
-				if (!_push)
+				if (!Settings.Player.Push)
 				{
-					if (Move % 2 == 0)
-					{
-						_sprRen.sprite = Horizontal1;
-					}
-					else
-					{
-						_sprRen.sprite = Horizontal2;
-					}
+					Settings.Player.SpriteRenderer.sprite = (Settings.Player.Move % 2 == 0) ? Settings.Player.Sprites.Horizontal1 : Settings.Player.Sprites.Horizontal2;
 				}
 				else
 				{
-					if (Move % 2 == 0)
-					{
-						_sprRen.sprite = HorizontalPush1;
-					}
-					else
-					{
-						_sprRen.sprite = HorizontalPush2;
-					}
+					Settings.Player.SpriteRenderer.sprite = (Settings.Player.Move % 2 == 0) ? Settings.Player.Sprites.HorizontalPush1 : Settings.Player.Sprites.HorizontalPush2;
 				}
 			}
 		}
 		else
 		{
-			_sprRen.sprite = Victory;
-			Speed = 0.0f;
+			Settings.Player.SpriteRenderer.sprite = Settings.Player.Sprites.Victory;
+			Settings.Player.Speed = 0.0f;
 		}
 
 
-		if (_push && Vector3.Distance(_boxPushed.transform.position, transform.position) > 1.4f)
+		if (Settings.Player.Push && Vector3.Distance(_boxPushed.transform.position, transform.position) > 1.4f)
 		{
-			_push = false;
+			Settings.Player.Push = false;
 		}		
 	}
 
@@ -226,10 +158,9 @@ public class PlayerController : MonoBehaviour
 	{
 		if (other.CompareTag("Box"))
 		{
-			other.GetComponent<BoxController>().TargetPos += Movement;
+			other.GetComponent<BoxController>().TargetPos += Settings.Player.Movement;
 			_boxPushed = other.gameObject;
-			_push = true;
-			Debug.Log("Enter");
+			Settings.Player.Push = true;
 			_lastBoxPos = other.transform.position;
 		}
 	}
@@ -237,15 +168,15 @@ public class PlayerController : MonoBehaviour
 	private bool Blocked()
 	{
 
-		foreach (var wall in _walls)
+		foreach (var wall in Settings.Walls)
 		{
-			if (wall.transform.position == _pos)
+			if (wall.transform.position == Settings.Player.Position)
 			{
 				return true;
 			}
 		}
 
-		foreach (var box in _boxes)
+		foreach (var box in Settings.Boxes)
 		{
 			if (box.GetComponent<BoxController>().Blocked())
 			{
@@ -259,29 +190,29 @@ public class PlayerController : MonoBehaviour
 
 	private void PlayerMove()
 	{
-		switch (_direction)
+		switch (Settings.Player.Direction)
 		{
 			case 1:
-				Movement = Vector3.up;
+				Settings.Player.Movement = Vector3.up;
 				_animDir = true;
 				break;
 			case 2:
-				Movement = Vector3.down;
+				Settings.Player.Movement = Vector3.down;
 				_animDir = true;
 				break;
 			case 3:
-				Movement = Vector3.right;
+				Settings.Player.Movement = Vector3.right;
 				_animDir = false;
 				break;
 			case 4:
-				Movement = Vector3.left;
+				Settings.Player.Movement = Vector3.left;
 				_animDir = false;
 				break;
 			default:
-				Movement = Vector3.zero;
+				Settings.Player.Movement = Vector3.zero;
 				break;
 		}
-		if (_pos == transform.position && !_keyPressed)
+		if (Settings.Player.Position == transform.position && !_keyPressed)
 		{
 			if (!Blocked())
 			{
@@ -289,21 +220,23 @@ public class PlayerController : MonoBehaviour
 					Mathf.Round(transform.position.x),
 					Mathf.Round(transform.position.y),
 					Mathf.Round(transform.position.z));
+				Settings.Player.Move++;
+				_back = false;
 			}
-			if (_push && !_boxPushed.GetComponent<BoxController>().Blocked())
+			if (Settings.Player.Push && !_boxPushed.GetComponent<BoxController>().Blocked())
 			{
 				_lastBoxPos = new Vector3(
 					Mathf.Round(_boxPushed.transform.position.x),
 					Mathf.Round(_boxPushed.transform.position.y),
 					Mathf.Round(_boxPushed.transform.position.z));
 			}
-			_pos += Movement * GridSize;
+			Settings.Player.Position += Settings.Player.Movement * Settings.Player.GridSize;
 			_keyPressed = true;
-			if (!Blocked())
-			{
-				Move++;
-				_back = false;
-			}
+//			if (!Blocked())
+//			{
+//				Settings.Player.Move++;
+//				_back = false;
+//			}
 		}
 	}
 }

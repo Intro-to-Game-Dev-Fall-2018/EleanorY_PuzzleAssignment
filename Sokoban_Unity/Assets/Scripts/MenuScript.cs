@@ -9,7 +9,7 @@ public class MenuScript : MonoBehaviour
 	private int _level;
 	public GameObject Arrow;
 	private AudioSource _audio;
-	public AudioClip SelectFX;
+	public AudioClip SelectFx;
 	
 	// Update is called once per frame
 	private void Start()
@@ -23,7 +23,7 @@ public class MenuScript : MonoBehaviour
 	{
 		if (Input.GetKeyUp(KeyCode.DownArrow))
 		{
-			_audio.PlayOneShot(SelectFX);
+			_audio.PlayOneShot(SelectFx);
 			if (_level + 1 > 3)
 			{
 				_level = 1;
@@ -35,7 +35,7 @@ public class MenuScript : MonoBehaviour
 		}
 		if (Input.GetKeyUp(KeyCode.UpArrow))
 		{
-			_audio.PlayOneShot(SelectFX);
+			_audio.PlayOneShot(SelectFx);
 			if (_level - 1 < 1)
 			{
 				_level = 3;

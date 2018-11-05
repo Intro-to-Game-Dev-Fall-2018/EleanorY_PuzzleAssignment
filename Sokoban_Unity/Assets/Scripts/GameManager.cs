@@ -7,10 +7,8 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
-	private GameObject[] _boxes;
-
-//	public GameObject WinText;
+	public GameSetting Settings;
+	
 	public Text WinText;
 	public Text SelectText;
 	public GameObject WinBox;
@@ -38,8 +36,17 @@ public class GameManager : MonoBehaviour
 
 
 	// Use this for initialization
+
+	private void Awake()
+	{
+		Settings.Boxes = GameObject.FindGameObjectsWithTag("Box");
+		Settings.Goals = GameObject.FindGameObjectsWithTag("Goal");
+		Settings.Walls = GameObject.FindGameObjectsWithTag("Wall");
+		Settings.Player.GameManager = this;
+		Settings.Player.Push = false;
+	}
 	
-	void Start()
+	private void Start()
 	{
 		_gameStart = true;
 		WinText.enabled = false;
@@ -47,7 +54,6 @@ public class GameManager : MonoBehaviour
 		WinBox.SetActive(false);
 		Arrow.SetActive(false);
 		MoveCount.enabled = false;
-		_boxes = GameObject.FindGameObjectsWithTag("Box");
 		_scene = SceneManager.GetActiveScene().buildIndex;
 		_audio = GetComponent<AudioSource>();
 
@@ -69,10 +75,11 @@ public class GameManager : MonoBehaviour
 			{
 				SceneManager.LoadScene(_scene);
 			}
-			else if (_select && Input.GetKeyUp("1"))
-			{
-				SceneManager.LoadScene(1);
-			}
+		}
+		
+		if (_select && Input.GetKeyUp("1"))
+		{
+			SceneManager.LoadScene(1);
 		}
 
 		if (!AllSet() && _gameStart && Input.GetKeyUp("1"))
@@ -124,7 +131,7 @@ public class GameManager : MonoBehaviour
 					_audio.PlayOneShot(WinAudio);
 					_audioPlayed = true;
 				}
-				if (Input.GetKeyUp("1"))
+				if (!_select && Input.GetKeyUp("1"))
 				{
 					if (_scene + 1 < SceneManager.sceneCountInBuildSettings)
 					{
@@ -139,7 +146,7 @@ public class GameManager : MonoBehaviour
 			Player.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Victory");
 		}
 
-		_moveCount = Player.GetComponent<PlayerController>().Move;
+		_moveCount = Settings.Player.Move;
 		MoveCount.text = _moveCount.ToString().PadLeft(4, '0');
 	
 
@@ -148,7 +155,7 @@ public class GameManager : MonoBehaviour
 
 	public bool AllSet()
 	{
-		foreach (var box in _boxes)
+		foreach (var box in Settings.Boxes)
 		{
 			if (!box.GetComponent<BoxController>().ReachGoal)
 			{
@@ -167,14 +174,8 @@ public class GameManager : MonoBehaviour
 				Player.GetComponent<PlayerController>().GameStart = false;
 			}
 
-			if (_select)
-			{
-				Arrow.transform.position = new Vector3(Arrow.transform.position.x, -3.43f, 0f);
-				;
-			}
-			else
-			{
-				Arrow.transform.position = new Vector3(Arrow.transform.position.x, -2.81f, 0f);
-			}
+		Arrow.transform.position = (_select) ?  
+				new Vector3(Arrow.transform.position.x, -3.43f, 0f): 
+				new Vector3(Arrow.transform.position.x, -2.81f, 0f);
 	}
 }
