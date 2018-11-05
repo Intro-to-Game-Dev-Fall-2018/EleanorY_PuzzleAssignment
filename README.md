@@ -21,7 +21,7 @@
 
 ---
 
-[Ver1.3_20181029](https://jiaxi-yang.itch.io/sokoban-ver13)
+[Ver1.3_20181029](https://jiaxi-yang.itch.io/sokoban-ver13) </br>
 [Ver1.4_20181105](https://jiaxi-yang.itch.io/sokoban-customized)
 
     【Customized Version】
