@@ -10,7 +10,8 @@ public class BoxController : MonoBehaviour {
 
 	private Vector3 _offset;
 	private int _playerStatus;
-
+	private GameObject _player;
+	
 	private SpriteRenderer _spriteRenderer;
 	public Sprite DarkBox;
 	public Sprite LightBox;
@@ -18,6 +19,7 @@ public class BoxController : MonoBehaviour {
 
 	private void Start()
 	{
+		_player = GameObject.FindWithTag("Player");
 		_spriteRenderer = GetComponent<SpriteRenderer>();
 		TargetPos = transform.position;
 		_expectTarget = transform.position;
@@ -25,7 +27,7 @@ public class BoxController : MonoBehaviour {
 
 	private void Update()
 	{	
-		_offset = Settings.Player.TransformPosition - transform.position;
+		_offset = _player.transform.position - transform.position;
 		if (_offset.x < -0.5f && _offset.x >= -1.0f && Mathf.Abs(_offset.y) < 0.8f)
 		{
 			_expectTarget = transform.position + Vector3.right;
@@ -106,3 +108,4 @@ public class BoxController : MonoBehaviour {
 		return false;
 	}
 }
+

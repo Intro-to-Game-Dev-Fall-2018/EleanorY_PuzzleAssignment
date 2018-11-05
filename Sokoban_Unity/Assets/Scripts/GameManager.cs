@@ -31,7 +31,6 @@ public class GameManager : MonoBehaviour
 		Settings.Goals = GameObject.FindGameObjectsWithTag("Goal");
 		Settings.Walls = GameObject.FindGameObjectsWithTag("Wall");
 		Settings.Player.GameManager = this;
-		Settings.Player.Push = false;
 		Settings.Player.GameStart = true;
 		Settings.Player.Audios.AudioSource = GetComponent<AudioSource>();
 		Settings.Player.Audios.AudioSource.clip = Settings.Player.Audios.Bgm;
@@ -51,7 +50,6 @@ public class GameManager : MonoBehaviour
 
 	}
 
-	// Update is called once per frame
 	private void Update()
 	{	
 		if (_pause)
@@ -94,18 +92,17 @@ public class GameManager : MonoBehaviour
 		}
 		else
 		{
-			Settings.Player.Audios.AudioSource.Stop();
 			MoveCount.enabled = false;
 			Settings.Player.GameStart = Input.GetKeyUp("1");
 		}
-
-
+		
 		if (AllSet())
 		{
 			Settings.Player.SpriteRenderer.flipX = false;
 			Settings.Player.SpriteRenderer.flipY = false;
 			Settings.Player.GameStart = false;
 			_timer += Time.deltaTime;
+			Settings.Player.SpriteRenderer.sprite = Settings.Player.Sprites.Victory;
 			if (_timer >= 2.0f)
 			{
 				WinBox.SetActive(true);
@@ -130,7 +127,6 @@ public class GameManager : MonoBehaviour
 					}
 				}
 			}
-			Settings.Player.SpriteRenderer.sprite = Settings.Player.Sprites.Victory;
 		}
 		MoveCount.text = Settings.Player.Move.ToString().PadLeft(4, '0');
 	}
@@ -152,3 +148,4 @@ public class GameManager : MonoBehaviour
 				new Vector3(Arrow.transform.position.x, -2.81f, 0f);
 	}
 }
+

@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
 	private void Awake()
 	{
 		Settings.Player.PlayerController = this;
+		Settings.Player.Direction = 0;
+		Settings.Player.Push = false;
+		Settings.Player.Position = transform.position;
 	}
 	
 	private void Start()
@@ -33,7 +36,6 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		Settings.Player.TransformPosition = transform.position;
 		if (Settings.Player.GameStart)
 		{
 			if (Input.GetKey(Settings.Player.Keycodes.Up))
@@ -145,7 +147,6 @@ public class PlayerController : MonoBehaviour
 		else
 		{
 			Settings.Player.SpriteRenderer.sprite = Settings.Player.Sprites.Victory;
-			Settings.Player.Speed = 0.0f;
 		}
 
 
@@ -213,6 +214,7 @@ public class PlayerController : MonoBehaviour
 		_back = false;
 	}
 }
+
 
 
 

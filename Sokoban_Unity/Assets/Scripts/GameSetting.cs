@@ -30,9 +30,7 @@ public class GameSetting : ScriptableObject
 		public int Direction;
 		public bool Push;
 		public Vector3 Position;
-		public Vector3 TransformPosition;
 		public PlayerController PlayerController;
-//		public GameObject BoxPushed;
 		
 		public SpriteRenderer SpriteRenderer;
 		public GameManager GameManager;

@@ -9,7 +9,7 @@ public class TitleScript : MonoBehaviour
 	public GameObject Title2;
 	public float Speed;
 	
-	// Update is called once per frame
+
 	private void Start()
 	{
 		Title.transform.position = new Vector3(0f, 6.6f, 0f);
@@ -44,4 +44,5 @@ public class TitleScript : MonoBehaviour
 		}		
 	}
 }
+
 

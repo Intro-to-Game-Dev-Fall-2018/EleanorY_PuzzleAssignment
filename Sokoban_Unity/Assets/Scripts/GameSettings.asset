@@ -15,12 +15,11 @@ MonoBehaviour:
     GameStart: 1
     Speed: 5
     GridSize: 1
-    Movement: {x: 0, y: 0, z: 0}
-    Move: 4
-    Direction: 0
+    Movement: {x: 1, y: 0, z: 0}
+    Move: 0
+    Direction: 3
     Push: 0
-    Position: {x: 3, y: -3, z: 0}
-    TransformPosition: {x: 2.9911573, y: -2.9860306, z: 0}
+    Position: {x: -2, y: 1, z: 0}
     PlayerController: {fileID: 0}
     SpriteRenderer: {fileID: 0}
     GameManager: {fileID: 0}
@@ -47,9 +46,8 @@ MonoBehaviour:
       Bgm: {fileID: 8300000, guid: 47a9fda89744143748f6f8bcb5715362, type: 3}
       WinAudio: {fileID: 8300000, guid: 1dbd779a1edc24846b1b9d896846eb6b, type: 3}
       PauseAudio: {fileID: 8300000, guid: 798391f58d97948679a1e69e00f781f3, type: 3}
-      BgmPlayed: 0
-      AudioPlayed: 0
   Boxes:
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -81,23 +79,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   Goals:
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

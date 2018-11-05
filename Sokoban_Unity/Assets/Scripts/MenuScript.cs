@@ -7,15 +7,16 @@ public class MenuScript : MonoBehaviour
 {
 
 	private int _level;
+	private int _levelCount;
 	public GameObject Arrow;
 	private AudioSource _audio;
 	public AudioClip SelectFx;
 	
-	// Update is called once per frame
 	private void Start()
 	{
 		_level = 1;
 		_audio = GetComponent<AudioSource>();
+		_levelCount = SceneManager.sceneCountInBuildSettings - 2;
 
 	}
 	
@@ -24,30 +25,17 @@ public class MenuScript : MonoBehaviour
 		if (Input.GetKeyUp(KeyCode.DownArrow))
 		{
 			_audio.PlayOneShot(SelectFx);
-			if (_level + 1 > 3)
-			{
-				_level = 1;
-			}
-			else
-			{
-				_level++;
-			}
+			_level = (_level + 1 > _levelCount) ? 1 : _level + 1;
 		}
+
 		if (Input.GetKeyUp(KeyCode.UpArrow))
 		{
 			_audio.PlayOneShot(SelectFx);
-			if (_level - 1 < 1)
-			{
-				_level = 3;
-			}
-			else
-			{
-				_level--;
-			}
+			_level = (_level - 1 < 1) ? _levelCount : _level - 1;
 		}
 		if (Input.GetKeyUp("1"))
 		{
-			SceneManager.LoadScene(_level+1);
+			SceneManager.LoadScene(_level + 1);
 		}
 		ArrowPos();
 	}
@@ -68,4 +56,5 @@ public class MenuScript : MonoBehaviour
 		}
 	}
 }
+
 
