@@ -12,6 +12,7 @@ TagManager:
   - Box
   - Wall
   - Goal
+  - Box2
   layers:
   - Default
   - TransparentFX
