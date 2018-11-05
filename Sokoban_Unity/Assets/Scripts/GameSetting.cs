@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "GameSettings", menuName = "Settings/GameSettings")]
 public class GameSetting : ScriptableObject 
@@ -21,6 +22,7 @@ public class GameSetting : ScriptableObject
 	[Serializable]
 	public struct PlayerSettings
 	{
+		public bool GameStart;
 		public float Speed;
 		public float GridSize;
 		public Vector3 Movement;
@@ -28,12 +30,15 @@ public class GameSetting : ScriptableObject
 		public int Direction;
 		public bool Push;
 		public Vector3 Position;
+		public Vector3 TransformPosition;
+		public PlayerController PlayerController;
 //		public GameObject BoxPushed;
 		
 		public SpriteRenderer SpriteRenderer;
 		public GameManager GameManager;
 		public SpriteSettings Sprites;
 		public KeycodeSettings Keycodes;
+		public AudioSettings Audios;
 	}
 	
 	[Serializable]
@@ -58,6 +63,14 @@ public class GameSetting : ScriptableObject
 		public KeyCode Left;
 		public KeyCode Right;
 		public KeyCode Back;
-		public KeyCode Action;
+	}
+	
+	[Serializable]
+	public struct AudioSettings
+	{
+		public AudioSource AudioSource;
+		public AudioClip Bgm;
+		public AudioClip WinAudio;
+		public AudioClip PauseAudio;
 	}
 }

@@ -1,23 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
 
 	public GameSetting Settings;	
+	
 	private GameObject _boxPushed;	
 	private bool _back;
 	private bool _keyPressed;
-
 	private bool _setOffset;
-
 	private Vector3 _lastPlayerPos;
 	private Vector3 _lastBoxPos;
-
 	private bool _animDir;
-	public bool GameStart;
-
+	
+	private void Awake()
+	{
+		Settings.Player.PlayerController = this;
+	}
+	
 	private void Start()
 	{
 		_back = true;
@@ -30,7 +33,8 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		if (GameStart)
+		Settings.Player.TransformPosition = transform.position;
+		if (Settings.Player.GameStart)
 		{
 			if (Input.GetKey(Settings.Player.Keycodes.Up))
 			{
@@ -89,14 +93,13 @@ public class PlayerController : MonoBehaviour
 				Mathf.Round(transform.position.z));
 		}
 
-		if (Input.anyKey && GameStart)
+		if (Input.anyKey && Settings.Player.GameStart)
 		{
 			switch (Settings.Player.Direction)
 			{
 				case 1:
 					Settings.Player.SpriteRenderer.flipX = false;
 					Settings.Player.SpriteRenderer.flipY = false;
-
 					break;
 				case 2:
 					Settings.Player.SpriteRenderer.flipX = false;
@@ -111,8 +114,6 @@ public class PlayerController : MonoBehaviour
 					Settings.Player.SpriteRenderer.flipY = false;
 					break;
 				case 0:
-					break;
-				default:
 					break;
 			}
 		}
@@ -156,35 +157,16 @@ public class PlayerController : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other)
 	{
-		if (other.CompareTag("Box"))
-		{
-			other.GetComponent<BoxController>().TargetPos += Settings.Player.Movement;
-			_boxPushed = other.gameObject;
-			Settings.Player.Push = true;
-			_lastBoxPos = other.transform.position;
-		}
+		if (!other.CompareTag("Box")) return;
+		other.GetComponent<BoxController>().TargetPos += Settings.Player.Movement;
+		_boxPushed = other.gameObject;
+		Settings.Player.Push = true;
+		_lastBoxPos = other.transform.position;
 	}
 
 	private bool Blocked()
 	{
-
-		foreach (var wall in Settings.Walls)
-		{
-			if (wall.transform.position == Settings.Player.Position)
-			{
-				return true;
-			}
-		}
-
-		foreach (var box in Settings.Boxes)
-		{
-			if (box.GetComponent<BoxController>().Blocked())
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return Settings.Walls.Any(wall => wall.transform.position == Settings.Player.Position) || Settings.Boxes.Any(box => box.GetComponent<BoxController>().Blocked());
 	}
 
 
@@ -212,32 +194,23 @@ public class PlayerController : MonoBehaviour
 				Settings.Player.Movement = Vector3.zero;
 				break;
 		}
-		if (Settings.Player.Position == transform.position && !_keyPressed)
+		if (Settings.Player.Position != transform.position || _keyPressed) return;
+		if (Settings.Player.Push && !_boxPushed.GetComponent<BoxController>().Blocked())
 		{
-			if (!Blocked())
-			{
-				_lastPlayerPos = new Vector3(
-					Mathf.Round(transform.position.x),
-					Mathf.Round(transform.position.y),
-					Mathf.Round(transform.position.z));
-				Settings.Player.Move++;
-				_back = false;
-			}
-			if (Settings.Player.Push && !_boxPushed.GetComponent<BoxController>().Blocked())
-			{
-				_lastBoxPos = new Vector3(
-					Mathf.Round(_boxPushed.transform.position.x),
-					Mathf.Round(_boxPushed.transform.position.y),
-					Mathf.Round(_boxPushed.transform.position.z));
-			}
-			Settings.Player.Position += Settings.Player.Movement * Settings.Player.GridSize;
-			_keyPressed = true;
-//			if (!Blocked())
-//			{
-//				Settings.Player.Move++;
-//				_back = false;
-//			}
+			_lastBoxPos = new Vector3(
+				Mathf.Round(_boxPushed.transform.position.x),
+				Mathf.Round(_boxPushed.transform.position.y),
+				Mathf.Round(_boxPushed.transform.position.z));
 		}
+		Settings.Player.Position += Settings.Player.Movement * Settings.Player.GridSize;
+		_keyPressed = true;
+		if (Blocked()) return;
+		_lastPlayerPos = new Vector3(
+			Mathf.Round(transform.position.x),
+			Mathf.Round(transform.position.y),
+			Mathf.Round(transform.position.z));
+		Settings.Player.Move++;
+		_back = false;
 	}
 }
 

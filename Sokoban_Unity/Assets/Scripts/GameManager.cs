@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,27 +16,14 @@ public class GameManager : MonoBehaviour
 	public GameObject Arrow;
 	public Text MoveCount;
 
-	private int _moveCount;
-
-	public GameObject Player;
 	private int _scene;
-
 	private float _timer;
 	private bool _pause;
 	private bool _select;
 
-	private AudioSource _audio;
-	public AudioClip WinAudio;
-	public AudioClip PauseAudio;
-
-	private bool _bgmPlayed;
 	private bool _audioPlayed;
+	private bool _bgmPlayed;
 
-	private bool _gameStart;
-
-
-
-	// Use this for initialization
 
 	private void Awake()
 	{
@@ -44,18 +32,22 @@ public class GameManager : MonoBehaviour
 		Settings.Walls = GameObject.FindGameObjectsWithTag("Wall");
 		Settings.Player.GameManager = this;
 		Settings.Player.Push = false;
+		Settings.Player.GameStart = true;
+		Settings.Player.Audios.AudioSource = GetComponent<AudioSource>();
+		Settings.Player.Audios.AudioSource.clip = Settings.Player.Audios.Bgm;
+		Settings.Player.Audios.AudioSource.loop = true;
+
 	}
 	
 	private void Start()
 	{
-		_gameStart = true;
 		WinText.enabled = false;
 		SelectText.enabled = false;
 		WinBox.SetActive(false);
 		Arrow.SetActive(false);
 		MoveCount.enabled = false;
+		Settings.Player.Audios.AudioSource.Play();
 		_scene = SceneManager.GetActiveScene().buildIndex;
-		_audio = GetComponent<AudioSource>();
 
 	}
 
@@ -67,8 +59,8 @@ public class GameManager : MonoBehaviour
 			Select();
 			if (!_audioPlayed)
 			{
-				_audio.Stop();
-				_audio.PlayOneShot(PauseAudio);
+				Settings.Player.Audios.AudioSource.Stop();
+				Settings.Player.Audios.AudioSource.PlayOneShot(Settings.Player.Audios.PauseAudio);
 				_audioPlayed = true;
 			}
 			if (!_select && Input.GetKeyUp("1"))
@@ -82,42 +74,37 @@ public class GameManager : MonoBehaviour
 			SceneManager.LoadScene(1);
 		}
 
-		if (!AllSet() && _gameStart && Input.GetKeyUp("1"))
+		if (!AllSet() && Settings.Player.GameStart && Input.GetKeyUp("1"))
 		{
 			WinBox.SetActive(true);
 			Arrow.SetActive(true);
 			SelectText.enabled = true;
 			_pause = true;
-			Player.GetComponent<PlayerController>().enabled = false;
+			Settings.Player.PlayerController.enabled = false;
 		}
 
-		if (_gameStart)
+		if (Settings.Player.GameStart)
 		{
 			if (!_bgmPlayed)
 			{
-				_audio.Play();
+				Settings.Player.Audios.AudioSource.Play();
 				_bgmPlayed = true;
 			}
 			MoveCount.enabled = true;
-			Player.GetComponent<PlayerController>().GameStart = true;
 		}
 		else
 		{
-			_audio.Stop();
+			Settings.Player.Audios.AudioSource.Stop();
 			MoveCount.enabled = false;
-			Player.GetComponent<PlayerController>().GameStart = false;
-			if (Input.GetKeyUp("1"))
-			{
-				_gameStart = true;
-			}
+			Settings.Player.GameStart = Input.GetKeyUp("1");
 		}
 
 
 		if (AllSet())
 		{
-			Player.GetComponent<SpriteRenderer>().flipX = false;
-			Player.GetComponent<SpriteRenderer>().flipY = false;
-			Player.GetComponent<PlayerController>().GameStart = false;
+			Settings.Player.SpriteRenderer.flipX = false;
+			Settings.Player.SpriteRenderer.flipY = false;
+			Settings.Player.GameStart = false;
 			_timer += Time.deltaTime;
 			if (_timer >= 2.0f)
 			{
@@ -127,8 +114,8 @@ public class GameManager : MonoBehaviour
 				Select();
 				if (!_audioPlayed)
 				{
-					_audio.Stop();
-					_audio.PlayOneShot(WinAudio);
+					Settings.Player.Audios.AudioSource.Stop();
+					Settings.Player.Audios.AudioSource.PlayOneShot(Settings.Player.Audios.WinAudio);
 					_audioPlayed = true;
 				}
 				if (!_select && Input.GetKeyUp("1"))
@@ -143,35 +130,21 @@ public class GameManager : MonoBehaviour
 					}
 				}
 			}
-			Player.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Victory");
+			Settings.Player.SpriteRenderer.sprite = Settings.Player.Sprites.Victory;
 		}
-
-		_moveCount = Settings.Player.Move;
-		MoveCount.text = _moveCount.ToString().PadLeft(4, '0');
-	
-
+		MoveCount.text = Settings.Player.Move.ToString().PadLeft(4, '0');
 	}
-
 
 	public bool AllSet()
 	{
-		foreach (var box in Settings.Boxes)
-		{
-			if (!box.GetComponent<BoxController>().ReachGoal)
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return Settings.Boxes.All(box => box.GetComponent<BoxController>().ReachGoal);
 	}
 
 	private void Select()
 	{
-			if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow))
+			if (Input.GetKeyUp(Settings.Player.Keycodes.Up) || Input.GetKeyUp(Settings.Player.Keycodes.Down))
 			{
 				_select = !_select;
-				Player.GetComponent<PlayerController>().GameStart = false;
 			}
 
 		Arrow.transform.position = (_select) ?  

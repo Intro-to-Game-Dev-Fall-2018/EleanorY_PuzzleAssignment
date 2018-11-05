@@ -1,16 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BoxController : MonoBehaviour {
 	public GameSetting Settings;
-	private Vector3 _currentPos;
 	public Vector3 TargetPos;
 	private Vector3 _expectTarget;
 
-	public GameObject Player;
 	private Vector3 _offset;
-
 	private int _playerStatus;
 
 	private SpriteRenderer _spriteRenderer;
@@ -27,38 +25,25 @@ public class BoxController : MonoBehaviour {
 
 	private void Update()
 	{	
-		_currentPos = transform.position;
-		_offset = Player.transform.position - transform.position;
+		_offset = Settings.Player.TransformPosition - transform.position;
 		if (_offset.x < -0.5f && _offset.x >= -1.0f && Mathf.Abs(_offset.y) < 0.8f)
 		{
-			_expectTarget = new Vector3(
-				_currentPos.x + 1,
-				_currentPos.y,
-				_currentPos.z);
+			_expectTarget = transform.position + Vector3.right;
 			_playerStatus = 3;
 		} 
 		else if (_offset.x > 0.5f && _offset.x <= 1.0f  && Mathf.Abs(_offset.y) < 0.8f)
 		{
-			_expectTarget = new Vector3(
-				_currentPos.x - 1,
-				_currentPos.y,
-				_currentPos.z);
+			_expectTarget = transform.position + Vector3.left;
 			_playerStatus = 4;
 		}
 		else if (_offset.y < -0.5f && _offset.y >= -1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
-			_expectTarget = new Vector3(
-				_currentPos.x,
-				_currentPos.y + 1,
-				_currentPos.z);
+			_expectTarget = transform.position + Vector3.up;
 			_playerStatus = 2;
 		} 
 		else if (_offset.y > 0.5f && _offset.y <= 1.0f  && Mathf.Abs(_offset.x) < 0.8f)
 		{
-			_expectTarget = new Vector3(
-				_currentPos.x,
-				_currentPos.y - 1,
-				_currentPos.z);
+			_expectTarget = transform.position + Vector3.down;
 			_playerStatus = 1;
 		}
 		else
@@ -69,14 +54,14 @@ public class BoxController : MonoBehaviour {
 
 		if (!Blocked())
 		{
-		transform.position = Vector3.MoveTowards(_currentPos, TargetPos, Time.deltaTime * 8);
+		transform.position = Vector3.MoveTowards(transform.position, TargetPos, Time.deltaTime * 8);
 		}
 		else
 		{
 			transform.position = new Vector3(
-				Mathf.Round(_currentPos.x),
-				Mathf.Round(_currentPos.y),
-				Mathf.Round(_currentPos.z));
+				Mathf.Round(transform.position.x),
+				Mathf.Round(transform.position.y),
+				Mathf.Round(transform.position.z));
 			TargetPos = transform.position;
 		}
 
@@ -96,23 +81,12 @@ public class BoxController : MonoBehaviour {
 
 	public bool Blocked()
 	{
-		foreach (var wall in Settings.Walls)
+		if (Settings.Walls.Any(wall => wall.transform.position == _expectTarget))
 		{
-			if (wall.transform.position == _expectTarget)
-			{
-				return CheckBlockedStatus();
-			}
+			return CheckBlockedStatus();
 		}
-
-		foreach (var box in Settings.Boxes)
-		{
-			if (box != this.gameObject && box.transform.position == _expectTarget)
-			{
-				return CheckBlockedStatus();
-			}
-		}
-			return false;
-		}
+		return Settings.Boxes.Any(box => box != this.gameObject && box.transform.position == _expectTarget) && CheckBlockedStatus();
+	}
 
 	private bool CheckBlockedStatus()
 	{
@@ -121,43 +95,14 @@ public class BoxController : MonoBehaviour {
 			case 0:
 				return false;
 			case 1:
-				if (Input.GetKey(Settings.Player.Keycodes.Down))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return Input.GetKey(Settings.Player.Keycodes.Down);
 			case 2:
-				if (Input.GetKey(Settings.Player.Keycodes.Up))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return Input.GetKey(Settings.Player.Keycodes.Up);
 			case 3:
-				if (Input.GetKey(Settings.Player.Keycodes.Right))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return Input.GetKey(Settings.Player.Keycodes.Right);
 			case 4:
-				if (Input.GetKey(Settings.Player.Keycodes.Left))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return Input.GetKey(Settings.Player.Keycodes.Left);
 		}
 		return false;
 	}
-
 }
