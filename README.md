@@ -22,8 +22,10 @@
 ---
 
 [Ver1.3_20181029](https://jiaxi-yang.itch.io/sokoban-ver13)
+[Ver1.4_20181105](https://jiaxi-yang.itch.io/sokoban-customized)
 
-    【Final Version of the Original Game】
+    【Customized Version】
+    Speed SOKOBAN!
     Update:
     - Undo function;
     - Levels and Level Selection;
